@@ -5,11 +5,13 @@
 // ──────────────────────────────────────────────────────────────────────
 
 const FB_CONFIG = {
-  apiKey:            "PEGAR_API_KEY_AQUI",
-  authDomain:        "TU_PROYECTO.firebaseapp.com",
-  databaseURL:       "https://TU_PROYECTO-default-rtdb.firebaseio.com",
-  projectId:         "TU_PROYECTO_ID",
-  storageBucket:     "TU_PROYECTO.appspot.com",
-  messagingSenderId: "PEGAR_SENDER_ID_AQUI",
-  appId:             "PEGAR_APP_ID_AQUI",
+     apiKey: "AIzaSyCV0SuOg6ec6gtwJMGiglz2ZVJTQf3ATPk",
+    authDomain: "contigo-9eabc.firebaseapp.com",
+    projectId: "contigo-9eabc",
+    storageBucket: "contigo-9eabc.firebasestorage.app",
+    messagingSenderId: "645371759960",
+    appId: "1:645371759960:web:4596b8ed0bdf1b67a3a92d"
 };
+
+  // Initialize Firebase
+  const app = initializeApp(FB_CONFIG);
