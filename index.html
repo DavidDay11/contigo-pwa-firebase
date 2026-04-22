@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0D0A0B">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Contigo">
+  <meta name="description" content="La app para parejas a distancia 💕">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Contigo 💕</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <!-- Tu config Firebase — rellenada en config.js -->
+  <script src="config.js"></script>
+  <style>
+    :root {
+      --bg: #0D0A0B;
+      --surface: #181215;
+      --surface2: #211820;
+      --surface3: #2C2028;
+      --border: #2E2228;
+      --accent: #E8799A;
+      --accent2: #C4956A;
+      --accent-dim: rgba(232,121,154,0.13);
+      --accent2-dim: rgba(196,149,106,0.12);
+      --text: #F5EEF0;
+      --text-muted: #9B8890;
+      --text-dim: #6B5560;
+      --font-display: 'Cormorant Garamond', serif;
+      --font-body: 'Nunito', sans-serif;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --nav-h: 68px;
+      --header-h: 58px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 5%, rgba(232,121,154,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 55% at 85% 95%, rgba(196,149,106,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(232,121,154,0.02) 0%, transparent 100%);
+      pointer-events: none; z-index: 0;
+    }
+
+    #app { max-width: 480px; margin: 0 auto; min-height: 100vh; position: relative; z-index: 1; }
+
+    /* === HEADER === */
+    .app-header {
+      position: sticky; top: 0; z-index: 100;
+      height: var(--header-h);
+      padding: 0 18px;
+      background: rgba(13,10,11,0.92);
+      backdrop-filter: blur(24px) saturate(1.5);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .logo {
+      font-family: var(--font-display);
+      font-size: 27px; font-weight: 500;
+      letter-spacing: 0.03em;
+      color: var(--text);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .logo em { color: var(--accent); font-style: normal; }
+
+    .header-right { display: flex; gap: 8px; }
+
+    .btn-icon {
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 16px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: .25s var(--ease);
+    }
+    .btn-icon:hover { background: var(--surface2); color: var(--accent); border-color: var(--accent); }
+
+    /* === SECTIONS === */
+    main { padding-bottom: calc(var(--nav-h) + 12px); }
+    .section { display: none; padding: 18px 16px; animation: fadeUp .3s var(--ease); }
+    .section.active { display: block; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+
+    /* === BOTTOM NAV === */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      height: var(--nav-h);
+      background: rgba(24,18,21,0.96);
+      backdrop-filter: blur(24px);
+      border-top: 1px solid var(--border);
+      display: flex; z-index: 100;
+      padding: 0 2px 2px;
+    }
+
+    .nav-btn {
+      flex: 1; border: none; background: none;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 3px;
+      cursor: pointer; color: var(--text-dim);
+      transition: .22s var(--ease); padding: 6px 2px;
+      position: relative;
+    }
+    .nav-btn.active { color: var(--accent); }
+    .nav-btn .ni { font-size: 21px; transition: .22s var(--ease); }
+    .nav-btn.active .ni { transform: scale(1.18) translateY(-1px); }
+    .nav-btn .nl { font-size: 9.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+    .nav-btn::before {
+      content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 0; height: 2px; background: var(--accent);
+      border-radius: 0 0 3px 3px; transition: .22s var(--ease);
+    }
+    .nav-btn.active::before { width: 36px; }
+
+    /* === CARDS === */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 17px; margin-bottom: 13px;
+    }
+    .card-glow {
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(232,121,154,0.06) 100%);
+      border-color: rgba(232,121,154,0.18);
+    }
+    .card-gold {
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(196,149,106,0.07) 100%);
+      border-color: rgba(196,149,106,0.2);
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 17px; font-weight: 500;
+      margin-bottom: 13px; color: var(--text);
+    }
+
+    /* === SECTION HEADER === */
+    .sec-head { margin-bottom: 18px; }
+    .sec-head h2 { font-family: var(--font-display); font-size: 30px; font-weight: 400; }
+    .sec-head p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
+
+    /* === BUTTONS === */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 11px 20px; border-radius: 50px; border: none;
+      font-family: var(--font-body); font-size: 13.5px; font-weight: 700;
+      cursor: pointer; transition: .22s var(--ease); letter-spacing: .02em;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 18px rgba(232,121,154,.35); }
+    .btn-primary:active { transform: scale(.97); }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-ghost { background: transparent; color: var(--text-muted); padding: 7px 12px; }
+    .btn-ghost:hover { color: var(--accent); }
+    .btn-full { width: 100%; }
+
+    /* === INPUTS === */
+    .label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: .06em; }
+    .ig { margin-bottom: 13px; }
+    .field {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 11px 13px;
+      color: var(--text); font-family: var(--font-body); font-size: 14px;
+      transition: .2s; outline: none;
+    }
+    .field:focus { border-color: var(--accent); }
+    .field::placeholder { color: var(--text-dim); }
+    select.field { cursor: pointer; }
+    select.field option { background: #1a1215; }
+    textarea.field { resize: vertical; min-height: 80px; }
+
+    /* === TAGS === */
+    .tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; border-radius: 50px; font-size: 11.5px; font-weight: 700; }
+    .tag-rose { background: rgba(232,121,154,.14); color: var(--accent); }
+    .tag-gold { background: rgba(196,149,106,.14); color: var(--accent2); }
+    .tag-green { background: rgba(100,200,150,.12); color: #6DC896; }
+    .tag-blue { background: rgba(100,160,220,.12); color: #6AABDC; }
+    .tag-dim { background: var(--surface2); color: var(--text-muted); }
+
+    /* === HOME === */
+    .hero-card {
+      background: linear-gradient(145deg, var(--surface) 0%, var(--surface2) 100%);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 22px 20px; margin-bottom: 13px; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .hero-card::after {
+      content: '💕'; position: absolute; font-size: 130px; opacity: .03;
+      right: -18px; top: -18px; pointer-events: none;
+    }
+
+    .avatars { display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 14px; }
+    .avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--surface3); border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; cursor: pointer; transition: .22s var(--ease); overflow: hidden; position: relative;
+    }
+    .avatar:hover { border-color: var(--accent); transform: scale(1.06); }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+    .av-edit {
+      position: absolute; inset: 0; background: rgba(0,0,0,.5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; border-radius: 50%; opacity: 0; transition: .2s;
+    }
+    .avatar:hover .av-edit { opacity: 1; }
+
+    .heart-pulse { font-size: 24px; animation: hb 1.6s ease-in-out infinite; }
+    @keyframes hb { 0%,100%{transform:scale(1)} 50%{transform:scale(1.25)} }
+
+    .couple-names { font-family: var(--font-display); font-size: 22px; font-weight: 400; margin-bottom: 16px; color: var(--text); }
+
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 14px; }
+    .stat-box { background: var(--surface3); border-radius: var(--radius-sm); padding: 13px 10px; text-align: center; }
+    .stat-val { font-family: var(--font-display); font-size: 34px; font-weight: 500; color: var(--accent); line-height: 1; }
+    .stat-lbl { font-size: 10.5px; color: var(--text-muted); margin-top: 3px; text-transform: uppercase; letter-spacing: .05em; }
+
+    .touch-btn {
+      width: 100%; padding: 15px;
+      background: linear-gradient(135deg, rgba(232,121,154,.18), rgba(196,149,106,.13));
+      border: 1px solid rgba(232,121,154,.28); border-radius: var(--radius);
+      color: var(--text); font-family: var(--font-body); font-size: 14.5px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px;
+      transition: .22s var(--ease); letter-spacing: .02em;
+    }
+    .touch-btn:hover { background: linear-gradient(135deg, rgba(232,121,154,.28), rgba(196,149,106,.22)); }
+    .touch-btn:active { transform: scale(.97); }
+
+    .clock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .clock-box { background: var(--surface2); border-radius: var(--radius-sm); padding: 13px; text-align: center; }
+    .clock-time { font-family: var(--font-display); font-size: 28px; font-weight: 400; color: var(--text); letter-spacing: .06em; }
+    .clock-lbl { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; font-weight: 700; text-transform: uppercase; }
+
+    .mood-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
+    .mood-btn {
+      aspect-ratio: 1; border: 2px solid var(--border); border-radius: 12px;
+      background: var(--surface2); font-size: 25px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: .2s var(--ease);
+    }
+    .mood-btn:hover, .mood-btn.on { border-color: var(--accent); background: var(--accent-dim); transform: scale(1.07); }
+    #mood-txt { text-align: center; margin-top: 10px; font-size: 13px; color: var(--text-muted); min-height: 20px; }
+
+    .quote-text { font-family: var(--font-display); font-size: 17px; font-weight: 300; font-style: italic; line-height: 1.65; color: var(--text); }
+    .quote-refresh { margin-top: 10px; padding: 6px 0; font-size: 12.5px; }
+
+    /* === WATCH === */
+    .filter-row { display: flex; gap: 7px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 3px; scrollbar-width: none; }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .ftab {
+      padding: 6px 15px; border-radius: 50px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-muted);
+      font-size: 12.5px; font-weight: 700; cursor: pointer; white-space: nowrap;
+      transition: .2s var(--ease);
+    }
+    .ftab.on, .ftab:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+    .watch-item {
+      display: flex; gap: 13px; align-items: flex-start;
+      padding: 13px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 9px; transition: .2s;
+    }
+    .watch-item:hover { border-color: rgba(232,121,154,.28); }
+    .watch-thumb {
+      width: 48px; height: 66px; border-radius: 7px;
+      background: var(--surface2); display: flex; align-items: center;
+      justify-content: center; font-size: 26px; flex-shrink: 0;
+    }
+    .watch-info { flex: 1; min-width: 0; }
+    .watch-title-t { font-weight: 700; font-size: 14.5px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .watch-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 7px; }
+    .watch-acts { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+
+    /* === GAMES === */
+    .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-bottom: 12px; }
+    .game-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 19px 14px;
+      cursor: pointer; transition: .22s var(--ease); text-align: center;
+    }
+    .game-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(232,121,154,.1); }
+    .game-card:active { transform: scale(.97); }
+    .gi { font-size: 36px; margin-bottom: 9px; }
+    .gn { font-weight: 700; font-size: 13.5px; margin-bottom: 3px; }
+    .gd { font-size: 11.5px; color: var(--text-muted); line-height: 1.4; }
+
+    .subsection-lbl { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 9px; margin-top: 4px; }
+
+    /* Game card */
+    .game-play-card {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 28px 22px;
+      text-align: center; min-height: 160px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      margin-bottom: 14px; cursor: pointer; transition: .2s;
+    }
+    .game-play-card:hover { border-color: rgba(232,121,154,.3); }
+    .game-q { font-family: var(--font-display); font-size: 21px; font-weight: 400; line-height: 1.45; color: var(--text); margin-bottom: 9px; }
+    .game-hint-lbl { font-size: 12px; color: var(--text-dim); }
+    .game-counter { text-align: center; font-size: 12.5px; color: var(--text-muted); }
+
+    /* Trivia hint */
+    .trivia-hint { font-size: 13px; color: var(--accent); margin-top: 7px; font-style: italic; }
+
+    /* Ruleta */
+    .ruleta-card {
+      background: linear-gradient(135deg, rgba(232,121,154,.15), rgba(196,149,106,.12));
+      border: 1px solid rgba(232,121,154,.25); border-radius: var(--radius);
+      padding: 28px 22px; text-align: center; margin-bottom: 14px; cursor: pointer;
+      transition: .2s;
+    }
+    .ruleta-card:hover { border-color: rgba(232,121,154,.45); }
+    .ruleta-activity { font-family: var(--font-display); font-size: 22px; font-weight: 400; line-height: 1.5; color: var(--text); }
+
+    /* === LOVE === */
+    .letter-card {
+      background: linear-gradient(145deg, var(--surface), rgba(232,121,154,.05));
+      border: 1px solid rgba(232,121,154,.18); border-radius: var(--radius);
+      padding: 19px; margin-bottom: 11px;
+    }
+    .letter-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .letter-from { font-size: 12.5px; color: var(--accent); font-weight: 700; }
+    .letter-date { font-size: 11.5px; color: var(--text-dim); }
+    .letter-body { font-family: var(--font-display); font-size: 16px; font-weight: 300; line-height: 1.72; color: var(--text); font-style: italic; }
+
+    /* === REMINDER === */
+    .rem-item {
+      display: flex; align-items: center; gap: 13px;
+      padding: 13px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 8px;
+    }
+    .rem-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+    .rem-info { flex: 1; }
+    .rem-title { font-weight: 700; font-size: 14px; }
+    .rem-date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+    /* === GALLERY === */
+    .gal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .gal-item {
+      aspect-ratio: 1; border-radius: var(--radius-sm); background: var(--surface2);
+      border: 1px solid var(--border); overflow: hidden; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: .2s; position: relative;
+    }
+    .gal-item:hover { transform: scale(1.02); border-color: var(--accent); }
+    .gal-item img { width: 100%; height: 100%; object-fit: cover; }
+    .gal-item .gal-emoji { font-size: 46px; }
+    .gal-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+      padding: 6px 8px; font-size: 11px; color: rgba(255,255,255,.8);
+    }
+    .gal-add { border: 2px dashed var(--border); }
+    .gal-add:hover { border-color: var(--accent); }
+    .gal-add span { font-size: 28px; color: var(--text-dim); }
+    .gal-add small { font-size: 12px; color: var(--text-dim); font-weight: 700; margin-top: 4px; }
+
+    /* === GIFTS === */
+    .gift-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 9px; cursor: pointer;
+      transition: .2s; text-decoration: none; color: var(--text);
+    }
+    .gift-item:hover { border-color: rgba(196,149,106,.35); }
+    .gift-ico { width: 46px; height: 46px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 23px; flex-shrink: 0; }
+    .gift-name { font-weight: 700; font-size: 14px; }
+    .gift-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .gift-arrow { color: var(--text-dim); font-size: 17px; margin-left: auto; }
+
+    .wish-row {
+      display: flex; align-items: center; gap: 9px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .wish-row:last-child { border-bottom: none; }
+
+    /* === MODAL === */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.72); backdrop-filter: blur(10px);
+      z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity .28s var(--ease);
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 22px 18px 30px; width: 100%; max-width: 480px;
+      max-height: 88vh; overflow-y: auto;
+      transform: translateY(100%); transition: transform .3s var(--ease);
+    }
+    .overlay.open .modal { transform: translateY(0); }
+    .modal-handle { width: 38px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+    .modal-title { font-family: var(--font-display); font-size: 24px; font-weight: 500; margin-bottom: 18px; text-align: center; }
+
+    /* === TOAST === */
+    .toast {
+      position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%;
+      transform: translateX(-50%) translateY(16px);
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); padding: 11px 20px; border-radius: 50px;
+      font-size: 13.5px; font-weight: 600; z-index: 400;
+      opacity: 0; transition: .28s var(--ease); white-space: nowrap;
+      box-shadow: 0 4px 24px rgba(0,0,0,.4);
+    }
+    .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* === MISC === */
+    .divider { height: 1px; background: var(--border); margin: 15px 0; }
+    .empty { text-align: center; padding: 36px 20px; color: var(--text-muted); }
+    .empty-ico { font-size: 44px; margin-bottom: 10px; }
+    .empty h3 { font-family: var(--font-display); font-size: 20px; color: var(--text); margin-bottom: 5px; }
+    .empty p { font-size: 13px; line-height: 1.5; }
+
+    .toggle { width: 42px; height: 23px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--border); cursor: pointer; position: relative; transition: .2s; flex-shrink: 0; }
+    .toggle.on { background: var(--accent); border-color: var(--accent); }
+    .toggle::after { content:''; position:absolute; top:2px; left:2px; width:17px; height:17px; border-radius:50%; background:white; transition:.2s; }
+    .toggle.on::after { transform: translateX(19px); }
+
+    .trow { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .trow-info .tl { font-size: 14px; font-weight: 700; }
+    .trow-info .td { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    @media (min-width: 481px) {
+      .section { padding: 22px 20px; }
+      .bottom-nav { border-radius: 0; }
+    }
+
+    /* ═══════════════ AUTH / LOGIN ═══════════════ */
+    #auth-screen {
+      position: fixed; inset: 0; z-index: 1000;
+      background: var(--bg); display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 24px; text-align: center;
+    }
+    #auth-screen::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 10%, rgba(232,121,154,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 80% 90%, rgba(196,149,106,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    #auth-screen.hidden { display: none; }
+
+    .auth-logo {
+      font-family: var(--font-display);
+      font-size: 52px; font-weight: 400; color: var(--text);
+      margin-bottom: 6px; position: relative; z-index: 1;
+    }
+    .auth-logo em { color: var(--accent); font-style: normal; }
+    .auth-tagline { font-size: 15px; color: var(--text-muted); margin-bottom: 44px; position: relative; z-index: 1; }
+
+    .auth-heart {
+      font-size: 80px; margin-bottom: 20px;
+      animation: hb 1.8s ease-in-out infinite;
+      position: relative; z-index: 1;
+    }
+
+    .btn-google {
+      display: flex; align-items: center; gap: 11px;
+      background: white; color: #1f1f1f;
+      border: none; border-radius: 50px;
+      padding: 14px 28px; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: .22s var(--ease);
+      box-shadow: 0 2px 20px rgba(0,0,0,.35);
+      font-family: var(--font-body); position: relative; z-index: 1;
+    }
+    .btn-google:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,0,0,.45); }
+    .btn-google:active { transform: scale(.97); }
+    .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ═══════════════ ONBOARDING (crear/unirse sala) ═══════════════ */
+    #onboard-screen {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--bg); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 32px 24px;
+    }
+    #onboard-screen.hidden { display: none; }
+
+    .onboard-card {
+      width: 100%; max-width: 380px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 24px; padding: 30px 24px; text-align: center;
+    }
+    .onboard-title { font-family: var(--font-display); font-size: 28px; font-weight: 400; margin-bottom: 6px; }
+    .onboard-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.55; }
+
+    .invite-code-display {
+      background: var(--surface2); border: 2px dashed rgba(232,121,154,.4);
+      border-radius: var(--radius); padding: 20px;
+      margin-bottom: 18px; cursor: pointer;
+      transition: .2s;
+    }
+    .invite-code-display:hover { border-color: var(--accent); }
+    .invite-code-val {
+      font-family: var(--font-display); font-size: 42px; font-weight: 500;
+      letter-spacing: .18em; color: var(--accent);
+    }
+    .invite-code-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+
+    /* ═══════════════ SYNC STATUS INDICATOR ═══════════════ */
+    .sync-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--text-dim); transition: .4s; flex-shrink: 0;
+    }
+    .sync-dot.online { background: #6DC896; box-shadow: 0 0 6px rgba(109,200,150,.5); }
+    .sync-dot.syncing { background: var(--accent2); animation: pulse-dot .8s ease-in-out infinite; }
+    .sync-dot.offline { background: #E87979; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+    .sync-row {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--text-dim); font-weight: 700;
+    }
+
+    /* ═══════════════ USER PILL (header) ═══════════════ */
+    .user-pill {
+      display: flex; align-items: center; gap: 7px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 50px; padding: 4px 10px 4px 4px;
+      cursor: pointer; transition: .2s;
+    }
+    .user-pill:hover { border-color: var(--accent); }
+    .user-pill-av {
+      width: 26px; height: 26px; border-radius: 50%;
+      object-fit: cover; background: var(--surface2);
+      font-size: 14px; display: flex; align-items: center; justify-content: center;
+    }
+    .user-pill-name { font-size: 12px; font-weight: 700; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* ═══════════════ PARTNER ONLINE BADGE ═══════════════ */
+    .partner-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 11px; border-radius: 50px;
+      font-size: 11.5px; font-weight: 700;
+      background: rgba(109,200,150,.1); color: #6DC896;
+      border: 1px solid rgba(109,200,150,.2);
+    }
+    .partner-badge.offline { background: var(--surface2); color: var(--text-muted); border-color: var(--border); }
+  </style>
+</head>
+<body>
+<!-- ═══════════ AUTH SCREEN ═══════════ -->
+<div id="auth-screen">
+  <div class="auth-heart">💕</div>
+  <div class="auth-logo">Con<em>tigo</em></div>
+  <p class="auth-tagline">Cerca aunque estén lejos</p>
+  <button class="btn-google" onclick="loginGoogle()">
+    <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Entrar con Google
+  </button>
+  <p style="margin-top:20px;font-size:12px;color:var(--text-dim);max-width:260px;line-height:1.6;position:relative;z-index:1;">
+    Tus datos se sincronizan en tiempo real entre vos y tu pareja 💕
+  </p>
+</div>
+
+<!-- ═══════════ ONBOARDING SCREEN ═══════════ -->
+<div id="onboard-screen" class="hidden">
+  <div class="onboard-card" id="onboard-card">
+    <!-- contenido dinámico -->
+  </div>
+</div>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="logo">Con<em>tigo</em> 💕</div>
+    <div class="header-right" style="display:flex;align-items:center;gap:8px;">
+      <div class="sync-row" id="sync-row">
+        <div class="sync-dot" id="sync-dot"></div>
+        <span id="sync-txt"></span>
+      </div>
+      <div class="user-pill" onclick="openUserMenu()" id="user-pill" style="display:none;">
+        <div class="user-pill-av" id="user-pill-av">👤</div>
+        <span class="user-pill-name" id="user-pill-name">—</span>
+      </div>
+      <button class="btn-icon" onclick="openSettings()" title="Configuración">⚙️</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ═══════════════ HOME ═══════════════ -->
+    <section class="section active" id="s-home">
+
+      <div class="hero-card">
+        <div class="avatars">
+          <div class="avatar" onclick="pickAvatar('me')" id="av-me-wrap">
+            <span id="av-me">🧑</span>
+            <div class="av-edit">📷</div>
+          </div>
+          <div class="heart-pulse">💕</div>
+          <div class="avatar" onclick="pickAvatar('them')" id="av-them-wrap">
+            <span id="av-them">👩</span>
+            <div class="av-edit">📷</div>
+          </div>
+        </div>
+        <div class="couple-names" id="couple-names">Vos &amp; Ellx</div>
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-val" id="days-together">—</div>
+            <div class="stat-lbl">Días juntos 💑</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="days-next">—</div>
+            <div class="stat-lbl">Para verte 🗓️</div>
+          </div>
+        </div>
+        <button class="touch-btn" id="touch-btn" onclick="sendTouch()">
+          💓 Mandar un latido
+        </button>
+        <div style="margin-top:10px;text-align:center;" id="partner-status-row"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⏰ Nuestros relojes</div>
+        <div class="clock-grid">
+          <div class="clock-box">
+            <div class="clock-time" id="clock-me">--:--</div>
+            <div class="clock-lbl" id="clock-me-lbl">Mi zona</div>
+          </div>
+          <div class="clock-box">
+            <div class="clock-time" id="clock-them">--:--</div>
+            <div class="clock-lbl" id="clock-them-lbl">Su zona</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🌙 ¿Cómo estás hoy?</div>
+        <div class="mood-row">
+          <button class="mood-btn" onclick="setMood('😍','Enamoradx')">😍</button>
+          <button class="mood-btn" onclick="setMood('😊','Feliz')">😊</button>
+          <button class="mood-btn" onclick="setMood('😴','Cansadx')">😴</button>
+          <button class="mood-btn" onclick="setMood('😔','Extrañándote')">😔</button>
+          <button class="mood-btn" onclick="setMood('🥰','Con ganas de verte')">🥰</button>
+        </div>
+        <div id="mood-txt"></div>
+      </div>
+
+      <div class="card card-gold">
+        <div class="card-title">✨ Frase del día</div>
+        <p class="quote-text" id="daily-quote"></p>
+        <button class="btn btn-ghost quote-refresh" onclick="nextQuote()">🔄 Otra frase</button>
+      </div>
+
+    </section>
+
+    <!-- ═══════════════ WATCH ═══════════════ -->
+    <section class="section" id="s-watch">
+      <div class="sec-head">
+        <h2>📺 Ver juntos</h2>
+        <p>Su lista compartida de series, pelis y animes</p>
+      </div>
+
+      <div class="filter-row">
+        <button class="ftab on" onclick="watchFilter('all',this)">Todo</button>
+        <button class="ftab" onclick="watchFilter('serie',this)">📺 Series</button>
+        <button class="ftab" onclick="watchFilter('pelicula',this)">🎬 Pelis</button>
+        <button class="ftab" onclick="watchFilter('anime',this)">⛩️ Anime</button>
+        <button class="ftab" onclick="watchFilter('docu',this)">📽️ Docs</button>
+        <button class="ftab" onclick="watchFilter('seen',this)">✅ Visto</button>
+      </div>
+
+      <div id="watch-list"></div>
+      <button class="btn btn-primary btn-full" onclick="openModal('m-add-watch')">+ Agregar título</button>
+    </section>
+
+    <!-- ═══════════════ GAMES ═══════════════ -->
+    <section class="section" id="s-games">
+      <div class="sec-head">
+        <h2>🎮 Juguemos</h2>
+        <p>Actividades para sentirse cerca aunque estén lejos</p>
+      </div>
+
+      <div class="subsection-lbl">Dentro de la app</div>
+      <div class="game-grid">
+        <div class="game-card" onclick="playGame('preguntas')">
+          <div class="gi">❓</div>
+          <div class="gn">Preguntas íntimas</div>
+          <div class="gd">Conócense con preguntas profundas</div>
+        </div>
+        <div class="game-card" onclick="playGame('preferirias')">
+          <div class="gi">⚖️</div>
+          <div class="gn">¿Preferirías?</div>
+          <div class="gd">Dilemas divertidos y reveladores</div>
+        </div>
+        <div class="game-card" onclick="playGame('verdad')">
+          <div class="gi">🎲</div>
+          <div class="gn">Verdad o Dato</div>
+          <div class="gd">La versión íntima para parejas</div>
+        </div>
+        <div class="game-card" onclick="playGame('ruleta')">
+          <div class="gi">🎡</div>
+          <div class="gn">Ruleta de amor</div>
+          <div class="gd">Actividades sorpresa para hacer juntos</div>
+        </div>
+      </div>
+
+      <div class="subsection-lbl">En llamada / vida real</div>
+      <div class="game-grid">
+        <div class="game-card" onclick="playGame('retos')">
+          <div class="gi">🏆</div>
+          <div class="gn">Retos en pareja</div>
+          <div class="gd">Desafíos para hacer juntos por video</div>
+        </div>
+        <div class="game-card" onclick="playGame('trivia')">
+          <div class="gi">🧠</div>
+          <div class="gn">Trivia de pareja</div>
+          <div class="gd">¿Cuánto sabés del otro?</div>
+        </div>
+        <div class="game-card" onclick="playGame('dibuja')">
+          <div class="gi">🎨</div>
+          <div class="gn">Adivina el dibujo</div>
+          <div class="gd">Dibujá y que adivine por video</div>
+        </div>
+        <div class="game-card" onclick="playGame('bucket')">
+          <div class="gi">📋</div>
+          <div class="gn">Bucket list</div>
+          <div class="gd">Sueños y metas para cumplir juntos</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════ LOVE ═══════════════ -->
+    <section class="section" id="s-love">
+      <div class="sec-head">
+        <h2>💌 Mensajes</h2>
+        <p>Palabras que abrazan desde lejos</p>
+      </div>
+
+      <div class="card card-glow">
+        <div class="card-title">📝 Nueva nota de amor</div>
+        <div class="ig">
+          <textarea class="field" id="love-input" rows="3" placeholder="Escribí algo desde el corazón..."></textarea>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;">
+          <button class="btn btn-ghost" onclick="scheduleMsg()" style="font-size:12px;">⏰ Programar</button>
+          <button class="btn btn-primary" onclick="sendLove()">Enviar 💕</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <div class="card-title">🔔 Recordatorios</div>
+        <div id="reminders-list"></div>
+        <button class="btn btn-secondary btn-full" onclick="openModal('m-add-reminder')">+ Agregar recordatorio</button>
+      </div>
+
+      <div class="divider"></div>
+      <div class="card-title" style="margin-bottom:12px;">💌 Notas enviadas</div>
+      <div id="love-list"></div>
+    </section>
+
+    <!-- ═══════════════ GALLERY ═══════════════ -->
+    <section class="section" id="s-gallery">
+      <div class="sec-head">
+        <h2>📸 Recuerdos</h2>
+        <p>El álbum de todo lo que les hace felices</p>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <span class="tag tag-rose">❤️ <span id="gal-count">0</span> recuerdos</span>
+        <span class="tag tag-gold">✨ Nuestra historia</span>
+      </div>
+
+      <div class="gal-grid" id="gal-grid"></div>
+    </section>
+
+    <!-- ═══════════════ GIFTS ═══════════════ -->
+    <section class="section" id="s-gifts">
+      <div class="sec-head">
+        <h2>🎁 Detalles</h2>
+        <p>Porque la distancia no frena los gestos de amor</p>
+      </div>
+
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-title">🌟 Lista de deseos</div>
+        <div id="wishlist-items"></div>
+        <button class="btn btn-secondary btn-full" onclick="addWish()" style="margin-top:9px;">+ Agregar deseo</button>
+      </div>
+
+      <div class="card-title" style="margin-bottom:11px;">💳 Métodos de pago / envío</div>
+      <div id="gift-list"></div>
+      <button class="btn btn-secondary btn-full" onclick="openModal('m-add-payment')">+ Agregar método</button>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="nav('home',this)"><span class="ni">🏠</span><span class="nl">Inicio</span></button>
+    <button class="nav-btn" onclick="nav('watch',this)"><span class="ni">📺</span><span class="nl">Ver</span></button>
+    <button class="nav-btn" onclick="nav('games',this)"><span class="ni">🎮</span><span class="nl">Jugar</span></button>
+    <button class="nav-btn" onclick="nav('love',this)"><span class="ni">💌</span><span class="nl">Amor</span></button>
+    <button class="nav-btn" onclick="nav('gallery',this)"><span class="ni">📸</span><span class="nl">Fotos</span></button>
+    <button class="nav-btn" onclick="nav('gifts',this)"><span class="ni">🎁</span><span class="nl">Regalos</span></button>
+  </nav>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════ MODALS ═══════════════ -->
+
+<!-- Settings -->
+<div class="overlay" id="m-settings">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ Configuración</div>
+    <div class="ig"><label class="label">Tu nombre</label><input class="field" id="cfg-me" placeholder="Tu nombre"></div>
+    <div class="ig"><label class="label">Nombre de tu pareja</label><input class="field" id="cfg-them" placeholder="Nombre de ellx"></div>
+    <div class="ig"><label class="label">Juntos desde</label><input class="field" type="date" id="cfg-date-start"></div>
+    <div class="ig"><label class="label">Próximo encuentro</label><input class="field" type="date" id="cfg-date-next"></div>
+    <div class="ig"><label class="label">Tu zona horaria</label><select class="field" id="cfg-tz-me"></select></div>
+    <div class="ig"><label class="label">Zona horaria de tu pareja</label><select class="field" id="cfg-tz-them"></select></div>
+    <div class="divider"></div>
+    <div class="trow"><div class="trow-info"><div class="tl">Notificaciones</div><div class="td">Recordatorios y alertas</div></div><div class="toggle on" id="tog-notif" onclick="this.classList.toggle('on')"></div></div>
+    <div class="trow" style="border:none;"><div class="trow-info"><div class="tl">Modo oscuro siempre</div><div class="td">Ya activado por defecto 🌙</div></div><div class="toggle on"></div></div>
+    <div class="divider"></div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-settings')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveSettings()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Watch -->
+<div class="overlay" id="m-add-watch">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📺 Agregar título</div>
+    <div class="ig"><label class="label">Título</label><input class="field" id="wt-title" placeholder="Ej: Breaking Bad"></div>
+    <div class="ig"><label class="label">Tipo</label>
+      <select class="field" id="wt-type">
+        <option value="serie">📺 Serie</option>
+        <option value="pelicula">🎬 Película</option>
+        <option value="anime">⛩️ Anime</option>
+        <option value="docu">📽️ Documental</option>
+      </select>
+    </div>
+    <div class="ig"><label class="label">Propuesto por</label>
+      <select class="field" id="wt-who">
+        <option value="me">Yo</option>
+        <option value="them">Mi pareja</option>
+      </select>
+    </div>
+    <div class="ig"><label class="label">Nota (opcional)</label><input class="field" id="wt-note" placeholder="¿Por qué lo recomendás?"></div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-add-watch')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveWatch()">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Game -->
+<div class="overlay" id="m-game">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="game-title">🎮</div>
+    <div id="game-content"></div>
+    <button class="btn btn-secondary btn-full" onclick="closeModal('m-game')" style="margin-top:11px;">Cerrar</button>
+  </div>
+</div>
+
+<!-- Add Reminder -->
+<div class="overlay" id="m-add-reminder">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔔 Nuevo recordatorio</div>
+    <div class="ig"><label class="label">Título</label><input class="field" id="rem-title" placeholder="Ej: Nuestro aniversario 🎉"></div>
+    <div class="ig"><label class="label">Fecha</label><input class="field" type="date" id="rem-date"></div>
+    <div class="ig"><label class="label">Color</label>
+      <select class="field" id="rem-color">
+        <option value="#E8799A">💗 Rosa</option>
+        <option value="#C4956A">✨ Dorado</option>
+        <option value="#6DC896">🌿 Verde</option>
+        <option value="#6AABDC">💙 Azul</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-add-reminder')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveReminder()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Payment -->
+<div class="overlay" id="m-add-payment">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">💳 Método de pago / envío</div>
+    <div class="ig"><label class="label">Plataforma</label>
+      <select class="field" id="pay-platform">
+        <option value="mercadopago">💳 MercadoPago</option>
+        <option value="paypal">🅿️ PayPal</option>
+        <option value="uala">💜 Ualá</option>
+        <option value="transferencia">🏦 Transferencia bancaria</option>
+        <option value="amazon">📦 Amazon Wishlist</option>
+        <option value="cafecito">☕ Cafecito</option>
+        <option value="otro">🔗 Otro enlace</option>
+      </select>
+    </div>
+    <div class="ig"><label class="label">Alias, usuario o enlace</label><input class="field" id="pay-handle" placeholder="Ej: nombre.alias o https://..."></div>
+    <div class="ig"><label class="label">¿De quién es?</label>
+      <select class="field" id="pay-owner">
+        <option value="me">El mío</option>
+        <option value="them">De mi pareja</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-add-payment')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="savePayment()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule message -->
+<div class="overlay" id="m-schedule">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⏰ Programar mensaje</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;text-align:center;line-height:1.55;">El mensaje se mostrará como notificación en el dispositivo en la fecha y hora elegida. Asegurate de tener notificaciones activadas.</p>
+    <div class="ig"><label class="label">Mensaje</label><textarea class="field" id="sch-text" rows="3" placeholder="Escribe tu mensaje..."></textarea></div>
+    <div class="ig"><label class="label">Fecha y hora</label><input class="field" type="datetime-local" id="sch-dt"></div>
+    <div class="ig"><label class="label">Para</label>
+      <select class="field" id="sch-for">
+        <option value="me">Para mí (recordatorio)</option>
+        <option value="them">Mostrar como mensaje a mi pareja</option>
+      </select>
+    </div>
+    <div id="sch-pending" style="margin-bottom:14px;"></div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-schedule')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveScheduled()">Programar ⏰</button>
+    </div>
+  </div>
+</div>
+
+<!-- User menu -->
+<div class="overlay" id="m-user-menu">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+      <div id="umenu-av" style="width:52px;height:52px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:26px;overflow:hidden;flex-shrink:0;"></div>
+      <div>
+        <div style="font-weight:700;font-size:16px;" id="umenu-name">—</div>
+        <div style="font-size:12px;color:var(--text-muted);" id="umenu-email">—</div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Tu código de pareja</div>
+      <div id="umenu-code" style="font-family:var(--font-display);font-size:34px;font-weight:500;letter-spacing:.2em;color:var(--accent);text-align:center;cursor:pointer;" onclick="copyInviteCode()">—</div>
+      <div style="font-size:11.5px;color:var(--text-muted);text-align:center;margin-top:5px;">Tocá para copiar y compartir con tu pareja</div>
+    </div>
+    <div class="trow"><div class="trow-info"><div class="tl">Pareja vinculada</div><div class="td" id="umenu-partner">Sin vincular aún</div></div><span id="umenu-partner-status"></span></div>
+    <div class="divider"></div>
+    <button class="btn btn-secondary btn-full" onclick="logout()" style="color:#E87979;border-color:rgba(232,121,154,.3);">Cerrar sesión</button>
+    <button class="btn btn-ghost btn-full" onclick="closeModal('m-user-menu')" style="margin-top:6px;">Cerrar</button>
+  </div>
+</div>
+
+<!-- Avatar picker -->
+<div class="overlay" id="m-avatar">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="av-modal-title">Elegí tu avatar</div>
+    <div id="av-emoji-grid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px;"></div>
+    <button class="btn btn-secondary btn-full" onclick="closeModal('m-avatar')">Cerrar</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════ FIREBASE INIT ═══════════════════════
+// FB_CONFIG viene de config.js
+let fbApp, fbAuth, fbDb;
+try {
+  fbApp  = firebase.app();
+} catch(e) {
+  fbApp = firebase.initializeApp(typeof FB_CONFIG !== 'undefined' ? FB_CONFIG : {});
+}
+fbAuth = firebase.auth();
+fbDb   = firebase.database();
+
+// ═══════════════════════ STATE ═══════════════════════
+const SK = 'contigo_v2';
+let S = {
+  cfg: { me: 'Vos', them: 'Ellx', start: '', next: '', tzMe: Intl.DateTimeFormat().resolvedOptions().timeZone, tzThem: 'America/New_York' },
+  avMe: '🧑', avThem: '👩',
+  watches: [],
+  love: [],
+  reminders: [],
+  gallery: [],
+  payments: [],
+  wishes: [],
+  buckets: [],
+  mood: null,
+};
+
+// Runtime auth state
+let currentUser  = null;   // Firebase user object
+let coupleId     = null;   // ID de la sala compartida
+let inviteCode   = null;   // Código de 6 letras para invitar
+let partnerUid   = null;   // UID de la pareja (si ya vinculada)
+let partnerOnline = false;
+let syncListenerRef = null; // Firebase listener activo
+let presenceRef = null;
+let isSyncing = false;
+
+// ══════════════════ LOAD / SAVE (localStorage cache) ══════════════════
+function loadLocal() {
+  try {
+    const d = localStorage.getItem(SK);
+    if (d) S = { ...S, ...JSON.parse(d) };
+  } catch(e) {}
+}
+
+function saveLocal() {
+  try { localStorage.setItem(SK, JSON.stringify(S)); } catch(e) {}
+}
+
+// save() = saveLocal + push to Firebase (debounced)
+let _saveTimer = null;
+function save() {
+  saveLocal();
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(pushToFirebase, 600);
+}
+
+// ══════════════════ FIREBASE SYNC ══════════════════
+function coupleRef(path = '') {
+  return fbDb.ref(`couples/${coupleId}${path ? '/' + path : ''}`);
+}
+
+async function pushToFirebase() {
+  if (!coupleId || !currentUser) return;
+  setSyncStatus('syncing');
+  try {
+    // Subimos todo excepto gallery (imágenes en base64 son muy pesadas)
+    const { gallery, ...syncable } = S;
+    await coupleRef('data').set({ ...syncable, _updatedBy: currentUser.uid, _ts: Date.now() });
+    setSyncStatus('online');
+  } catch(e) {
+    setSyncStatus('offline');
+    console.error('FB push error:', e);
+  }
+}
+
+function attachSyncListener() {
+  if (syncListenerRef) syncListenerRef.off();
+  syncListenerRef = coupleRef('data');
+  syncListenerRef.on('value', snap => {
+    const data = snap.val();
+    if (!data) return;
+    // Solo aplicar si el cambio viene de la pareja (evitar loop)
+    if (data._updatedBy === currentUser?.uid) return;
+    const { _updatedBy, _ts, gallery: _gal, ...incoming } = data;
+    S = { ...S, ...incoming };
+    saveLocal();
+    // Re-render current section
+    rerenderCurrent();
+  });
+}
+
+function attachLatidoListener() {
+  coupleRef('latido').on('value', snap => {
+    const data = snap.val();
+    if (!data || data.from === currentUser?.uid) return;
+    // Recibí un latido de la pareja — solo si fue reciente (< 5s)
+    if (Date.now() - data.ts < 5000) {
+      const btn = document.getElementById('touch-btn');
+      btn.innerHTML = `💓 ¡${S.cfg.them} te mandó un latido!`;
+      btn.style.background = 'linear-gradient(135deg,rgba(232,121,154,.38),rgba(196,149,106,.28))';
+      showToast(`💓 ¡${S.cfg.them} te mandó un latido!`);
+      if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 400]);
+      setTimeout(() => {
+        btn.innerHTML = '💓 Mandar un latido';
+        btn.style.background = '';
+      }, 4000);
+    }
+  });
+}
+
+function attachPresenceListener() {
+  if (!coupleId || !currentUser) return;
+  // Marcar mi presencia online
+  const myPresRef = fbDb.ref(`couples/${coupleId}/presence/${currentUser.uid}`);
+  myPresRef.set({ online: true, lastSeen: Date.now(), name: S.cfg.me });
+  myPresRef.onDisconnect().set({ online: false, lastSeen: Date.now(), name: S.cfg.me });
+  presenceRef = myPresRef;
+
+  // Escuchar presencia de la pareja
+  coupleRef('presence').on('value', snap => {
+    const presData = snap.val() || {};
+    const uids = Object.keys(presData).filter(u => u !== currentUser.uid);
+    if (uids.length > 0) {
+      partnerUid = uids[0];
+      const p = presData[uids[0]];
+      partnerOnline = p?.online === true && (Date.now() - (p?.lastSeen||0) < 30000);
+      updatePartnerStatus();
+    }
+  });
+}
+
+function setSyncStatus(state) {
+  isSyncing = state === 'syncing';
+  const dot = document.getElementById('sync-dot');
+  const txt = document.getElementById('sync-txt');
+  if (!dot) return;
+  dot.className = 'sync-dot ' + state;
+  txt.textContent = state === 'online' ? 'Sincronizado' : state === 'syncing' ? 'Guardando…' : 'Sin conexión';
+}
+
+function updatePartnerStatus() {
+  const row = document.getElementById('partner-status-row');
+  if (!row) return;
+  const name = S.cfg.them || 'Tu pareja';
+  if (partnerOnline) {
+    row.innerHTML = `<span class="partner-badge">🟢 ${name} está online</span>`;
+  } else {
+    row.innerHTML = `<span class="partner-badge offline">⚪ ${name} está offline</span>`;
+  }
+}
+
+function rerenderCurrent() {
+  const active = document.querySelector('.section.active');
+  if (!active) return;
+  const id = active.id.replace('s-','');
+  if (id === 'home') renderHome();
+  else if (id === 'watch') renderWatches();
+  else if (id === 'love') renderLove();
+  else if (id === 'gallery') renderGallery();
+  else if (id === 'gifts') renderGifts();
+}
+
+// ══════════════════ AUTH FLOW ══════════════════
+function loginGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.addScope('profile');
+  provider.addScope('email');
+  fbAuth.signInWithPopup(provider).catch(err => {
+    if (err.code !== 'auth/popup-closed-by-user') showToast('❌ Error: ' + err.message);
+  });
+}
+
+function logout() {
+  if (presenceRef) presenceRef.set({ online: false, lastSeen: Date.now(), name: S.cfg.me });
+  if (syncListenerRef) syncListenerRef.off();
+  fbAuth.signOut().then(() => {
+    coupleId = null; currentUser = null; inviteCode = null; partnerUid = null;
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('onboard-screen').classList.add('hidden');
+    document.getElementById('app').style.display = 'none';
+    closeModal('m-user-menu');
+  });
+}
+
+fbAuth.onAuthStateChanged(async user => {
+  if (!user) {
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('onboard-screen').classList.add('hidden');
+    document.getElementById('app').style.display = 'none';
+    return;
+  }
+
+  currentUser = user;
+  document.getElementById('auth-screen').classList.add('hidden');
+  updateUserPill();
+
+  // Buscar si ya tiene coupleId guardado
+  const ucSnap = await fbDb.ref(`userCouples/${user.uid}`).get();
+  if (ucSnap.exists()) {
+    coupleId = ucSnap.val();
+    await loadFromFirebase();
+    enterApp();
+  } else {
+    showOnboarding();
+  }
+});
+
+function updateUserPill() {
+  if (!currentUser) return;
+  const pill = document.getElementById('user-pill');
+  const av   = document.getElementById('user-pill-av');
+  const name = document.getElementById('user-pill-name');
+  pill.style.display = 'flex';
+  const shortName = (currentUser.displayName || 'Vos').split(' ')[0];
+  name.textContent = shortName;
+  if (currentUser.photoURL) {
+    av.innerHTML = `<img src="${currentUser.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  } else {
+    av.textContent = '👤';
+  }
+  // Actualizar cfg.me con nombre real
+  if (!S.cfg.me || S.cfg.me === 'Vos') {
+    S.cfg.me = shortName;
+    saveLocal();
+  }
+}
+
+function openUserMenu() {
+  if (!currentUser) return;
+  const av = document.getElementById('umenu-av');
+  document.getElementById('umenu-name').textContent = currentUser.displayName || 'Sin nombre';
+  document.getElementById('umenu-email').textContent = currentUser.email || '';
+  document.getElementById('umenu-code').textContent = inviteCode || '—';
+  document.getElementById('umenu-partner').textContent = partnerUid ? (S.cfg.them || 'Vinculadx ✅') : 'Sin vincular aún';
+  document.getElementById('umenu-partner-status').innerHTML = partnerUid
+    ? `<span class="tag tag-green">✅ Vinculadx</span>`
+    : `<span class="tag tag-dim">Pendiente</span>`;
+  if (currentUser.photoURL) {
+    av.innerHTML = `<img src="${currentUser.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  } else {
+    av.textContent = '👤';
+  }
+  openModal('m-user-menu');
+}
+
+function copyInviteCode() {
+  if (!inviteCode) return;
+  navigator.clipboard?.writeText(inviteCode)
+    .then(() => showToast('📋 Código copiado: ' + inviteCode))
+    .catch(() => showToast('Tu código: ' + inviteCode));
+}
+
+// ══════════════════ ONBOARDING ══════════════════
+function showOnboarding() {
+  const screen = document.getElementById('onboard-screen');
+  const card = document.getElementById('onboard-card');
+  screen.classList.remove('hidden');
+  document.getElementById('app').style.display = 'none';
+
+  card.innerHTML = `
+    <div style="font-size:52px;margin-bottom:12px;">💑</div>
+    <div class="onboard-title">¡Hola, ${(currentUser.displayName||'').split(' ')[0] || 'bienvenidx'}!</div>
+    <p class="onboard-sub">¿Querés crear una sala nueva para tu pareja, o unirte a una existente con el código que te pasaron?</p>
+    <button class="btn btn-primary btn-full" onclick="createRoom()" style="margin-bottom:10px;">💕 Crear sala nueva</button>
+    <button class="btn btn-secondary btn-full" onclick="showJoinRoom()">🔑 Unirme con código</button>
+  `;
+}
+
+async function createRoom() {
+  const card = document.getElementById('onboard-card');
+  card.innerHTML = `<div style="font-size:32px;margin-bottom:12px;animation:hb 1.2s infinite;">💕</div><p style="color:var(--text-muted);">Creando tu sala…</p>`;
+
+  // Generar coupleId y código de 6 caracteres
+  const newCoupleId = uid();
+  const code = Math.random().toString(36).substr(2,6).toUpperCase();
+  inviteCode = code;
+  coupleId = newCoupleId;
+
+  // Guardar en Firebase
+  await fbDb.ref(`userCouples/${currentUser.uid}`).set(newCoupleId);
+  await fbDb.ref(`couples/${newCoupleId}/members/${currentUser.uid}`).set({
+    name: currentUser.displayName || S.cfg.me,
+    photoURL: currentUser.photoURL || '',
+    joinedAt: Date.now(),
+  });
+  await fbDb.ref(`invites/${code}`).set({
+    coupleId: newCoupleId,
+    createdBy: currentUser.uid,
+    createdAt: Date.now(),
+  });
+
+  // Mostrar código
+  card.innerHTML = `
+    <div style="font-size:36px;margin-bottom:10px;">🎉</div>
+    <div class="onboard-title">¡Sala creada!</div>
+    <p class="onboard-sub">Compartí este código con tu pareja para que se una:</p>
+    <div class="invite-code-display" onclick="copyOnboardCode()">
+      <div class="invite-code-val" id="ob-code">${code}</div>
+      <div class="invite-code-hint">Tocá para copiar 📋</div>
+    </div>
+    <p style="font-size:12px;color:var(--text-dim);margin-bottom:18px;line-height:1.5;">Tu pareja abre la app, inicia sesión con Google y elige "Unirme con código"</p>
+    <button class="btn btn-primary btn-full" onclick="enterAfterCreate()">Entrar a mi sala →</button>
+  `;
+
+  window.copyOnboardCode = () => {
+    navigator.clipboard?.writeText(code).then(()=>showToast('📋 Código copiado: '+code)).catch(()=>showToast('Código: '+code));
+  };
+}
+
+function enterAfterCreate() {
+  loadFromFirebase().then(() => enterApp());
+}
+
+function showJoinRoom() {
+  const card = document.getElementById('onboard-card');
+  card.innerHTML = `
+    <div style="font-size:42px;margin-bottom:10px;">🔑</div>
+    <div class="onboard-title">Unirme a una sala</div>
+    <p class="onboard-sub">Ingresá el código de 6 letras que te compartió tu pareja:</p>
+    <input class="field" id="join-code-inp" placeholder="XXXXXX" maxlength="6"
+      style="text-align:center;font-size:28px;font-family:var(--font-display);letter-spacing:.2em;margin-bottom:14px;text-transform:uppercase;">
+    <button class="btn btn-primary btn-full" onclick="joinRoom()" style="margin-bottom:8px;">Unirme 💕</button>
+    <button class="btn btn-ghost btn-full" onclick="showOnboarding()">← Volver</button>
+  `;
+  setTimeout(() => document.getElementById('join-code-inp')?.focus(), 100);
+}
+
+async function joinRoom() {
+  const code = document.getElementById('join-code-inp').value.trim().toUpperCase();
+  if (code.length < 6) { showToast('⚠️ Ingresá un código de 6 caracteres'); return; }
+
+  const card = document.getElementById('onboard-card');
+  card.innerHTML = `<div style="font-size:32px;margin-bottom:12px;animation:hb 1.2s infinite;">🔍</div><p style="color:var(--text-muted);">Buscando sala…</p>`;
+
+  try {
+    const snap = await fbDb.ref(`invites/${code}`).get();
+    if (!snap.exists()) {
+      card.innerHTML = `
+        <div style="font-size:36px;margin-bottom:10px;">❌</div>
+        <div class="onboard-title">Código no encontrado</div>
+        <p class="onboard-sub">Verificá el código e intentá de nuevo.</p>
+        <button class="btn btn-primary btn-full" onclick="showJoinRoom()">Intentar de nuevo</button>
+        <button class="btn btn-ghost btn-full" onclick="showOnboarding()">Volver</button>
+      `;
+      return;
+    }
+
+    const { coupleId: cId, createdBy } = snap.val();
+    coupleId = cId;
+    inviteCode = code;
+
+    // Registrarme como miembro
+    await fbDb.ref(`userCouples/${currentUser.uid}`).set(cId);
+    await fbDb.ref(`couples/${cId}/members/${currentUser.uid}`).set({
+      name: currentUser.displayName || S.cfg.me,
+      photoURL: currentUser.photoURL || '',
+      joinedAt: Date.now(),
+    });
+
+    card.innerHTML = `
+      <div style="font-size:42px;margin-bottom:10px;">🎉</div>
+      <div class="onboard-title">¡Vinculadxs!</div>
+      <p class="onboard-sub">Ya están conectados. ¡Todo listo para estar juntos aunque estén lejos! 💕</p>
+      <button class="btn btn-primary btn-full" onclick="enterAfterJoin()">Entrar →</button>
+    `;
+  } catch(e) {
+    showToast('❌ Error al unirse: ' + e.message);
+    showJoinRoom();
+  }
+}
+
+async function enterAfterJoin() { await loadFromFirebase(); enterApp(); }
+
+// ══════════════════ ENTER APP ══════════════════
+async function enterApp() {
+  document.getElementById('onboard-screen').classList.add('hidden');
+  document.getElementById('app').style.display = 'block';
+
+  // Cargar invite code si no lo tenemos
+  if (!inviteCode) {
+    const snap = await fbDb.ref(`couples/${coupleId}/members`).get();
+    const members = snap.val() || {};
+    // Buscar código en invites (solo creator lo tiene; partner simplemente ya está)
+    const invSnap = await fbDb.ref('invites').orderByChild('coupleId').equalTo(coupleId).get();
+    if (invSnap.exists()) {
+      inviteCode = Object.keys(invSnap.val())[0];
+    }
+    // Detectar partner uid
+    const uids = Object.keys(members);
+    partnerUid = uids.find(u => u !== currentUser.uid) || null;
+    if (partnerUid && members[partnerUid]?.name) {
+      if (!S.cfg.them || S.cfg.them === 'Ellx') {
+        S.cfg.them = members[partnerUid].name.split(' ')[0];
+        save();
+      }
+    }
+  }
+
+  setSyncStatus('online');
+  attachSyncListener();
+  attachLatidoListener();
+  attachPresenceListener();
+  renderHome();
+  renderWatches();
+}
+
+async function loadFromFirebase() {
+  if (!coupleId) return;
+  try {
+    const snap = await coupleRef('data').get();
+    if (snap.exists()) {
+      const { _updatedBy, _ts, gallery: _gal, ...data } = snap.val();
+      S = { ...S, ...data };
+      saveLocal();
+    }
+  } catch(e) { console.error('FB load error:', e); }
+}
+function nav(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'home') renderHome();
+  if (id === 'watch') renderWatches();
+  if (id === 'love') renderLove();
+  if (id === 'gallery') renderGallery();
+  if (id === 'gifts') renderGifts();
+}
+
+// ═══════════════════════ HOME ═══════════════════════
+const QUOTES = [
+  "\"La distancia no es un obstáculo, es un recordatorio de cuán fuerte puede ser el amor.\"",
+  "\"Te extraño como la luna extraña el día.\"",
+  "\"Cada kilómetro que nos separa es uno menos que tenemos que recorrer para estar juntos.\"",
+  "\"Amo la distancia porque me recuerda que tengo algo hermoso a quien volver.\"",
+  "\"El amor no conoce fronteras, ni distancias, ni tiempos.\"",
+  "\"Aunque lejos, cada latido de mi corazón lleva tu nombre.\"",
+  "\"Nos separa la distancia, pero nos une el corazón.\"",
+  "\"Estar lejos tuyo me enseñó cuánto te necesito cerca.\"",
+  "\"El mejor momento del día es cuando hablo con vos.\"",
+  "\"La distancia es solo una prueba para ver qué tan lejos puede llegar el amor.\"",
+  "\"Si me preguntan a cuánto estás, diría que a una llamada.\"",
+  "\"Soñar con verte me hace despertar con ganas de que llegue ese día.\"",
+];
+
+let qIdx = 0;
+function nextQuote() { qIdx = (qIdx + 1) % QUOTES.length; document.getElementById('daily-quote').textContent = QUOTES[qIdx]; }
+
+function renderHome() {
+  document.getElementById('couple-names').innerHTML = `${S.cfg.me} &amp; ${S.cfg.them}`;
+  document.getElementById('av-me').textContent = S.avMe;
+  document.getElementById('av-them').textContent = S.avThem;
+  if (S.cfg.start) {
+    const d = Math.floor((Date.now() - new Date(S.cfg.start)) / 864e5);
+    document.getElementById('days-together').textContent = d >= 0 ? d : '—';
+  }
+  if (S.cfg.next) {
+    const d = Math.ceil((new Date(S.cfg.next) - Date.now()) / 864e5);
+    document.getElementById('days-next').textContent = d >= 0 ? d : '¡YA!';
+  }
+  document.getElementById('clock-me-lbl').textContent = (S.cfg.me || 'Yo') + ' 📍';
+  document.getElementById('clock-them-lbl').textContent = (S.cfg.them || 'Tu pareja') + ' 📍';
+  if (S.mood) {
+    document.getElementById('mood-txt').textContent = `Hoy te sentís: ${S.mood.emoji} ${S.mood.label}`;
+    document.querySelectorAll('.mood-btn').forEach(b => {
+      b.classList.toggle('on', b.textContent === S.mood.emoji);
+    });
+  }
+}
+
+function sendTouch() {
+  const btn = document.getElementById('touch-btn');
+  btn.innerHTML = '💓💓💓 ¡Latido enviado!';
+  btn.style.borderColor = 'var(--accent)';
+  // Push al Firebase para que la pareja lo reciba en tiempo real
+  if (coupleId && currentUser) {
+    coupleRef('latido').set({ from: currentUser.uid, ts: Date.now() });
+  }
+  showToast('💓 ' + S.cfg.them + ' recibió tu latido');
+  setTimeout(() => { btn.innerHTML = '💓 Mandar un latido'; btn.style.borderColor = ''; }, 3000);
+}
+
+function setMood(emoji, label) {
+  S.mood = { emoji, label };
+  save();
+  document.getElementById('mood-txt').textContent = `Hoy te sentís: ${emoji} ${label}`;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('on', b.textContent === emoji));
+  showToast(emoji + ' Mood guardado');
+}
+
+// Clocks
+function updateClocks() {
+  const fmt = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+  const now = new Date();
+  try {
+    document.getElementById('clock-me').textContent = now.toLocaleTimeString('es-AR', { ...fmt, timeZone: S.cfg.tzMe });
+    document.getElementById('clock-them').textContent = now.toLocaleTimeString('es-AR', { ...fmt, timeZone: S.cfg.tzThem });
+  } catch(e) {}
+}
+setInterval(updateClocks, 1000);
+updateClocks();
+
+// ═══════════════════════ SETTINGS ═══════════════════════
+const TZS = [
+  'America/Argentina/Buenos_Aires','America/Argentina/Cordoba','America/Argentina/Mendoza',
+  'America/New_York','America/Chicago','America/Denver','America/Los_Angeles',
+  'America/Sao_Paulo','America/Mexico_City','America/Bogota','America/Lima','America/Santiago',
+  'America/Caracas','America/Montevideo','America/Asuncion',
+  'Europe/Madrid','Europe/London','Europe/Paris','Europe/Berlin','Europe/Rome',
+  'Asia/Tokyo','Asia/Seoul','Asia/Shanghai','Asia/Kolkata','Asia/Dubai',
+  'Australia/Sydney','Pacific/Auckland','Africa/Cairo',
+];
+
+function openSettings() {
+  const fills = (id, val, opts) => {
+    const el = document.getElementById(id);
+    el.innerHTML = opts.map(o => `<option value="${o}" ${o===val?'selected':''}>${o.replace(/_/g,' ')}</option>`).join('');
+  };
+  fills('cfg-tz-me', S.cfg.tzMe, TZS);
+  fills('cfg-tz-them', S.cfg.tzThem, TZS);
+  document.getElementById('cfg-me').value = S.cfg.me;
+  document.getElementById('cfg-them').value = S.cfg.them;
+  document.getElementById('cfg-date-start').value = S.cfg.start;
+  document.getElementById('cfg-date-next').value = S.cfg.next;
+  openModal('m-settings');
+}
+
+function saveSettings() {
+  S.cfg.me = document.getElementById('cfg-me').value.trim() || 'Vos';
+  S.cfg.them = document.getElementById('cfg-them').value.trim() || 'Ellx';
+  S.cfg.start = document.getElementById('cfg-date-start').value;
+  S.cfg.next = document.getElementById('cfg-date-next').value;
+  S.cfg.tzMe = document.getElementById('cfg-tz-me').value;
+  S.cfg.tzThem = document.getElementById('cfg-tz-them').value;
+  save();
+  renderHome();
+  closeModal('m-settings');
+  showToast('✅ Configuración guardada');
+}
+
+// ═══════════════════════ AVATARS ═══════════════════════
+const AV_EMOJIS = ['🧑','👨','🧔','👩','👱','👩‍🦰','👩‍🦱','🧑‍🦯','👼','🥰','😎','🤓','🧑‍🎤','👩‍🎤','🧑‍💻','👸','🤴','🧙','🧝','🦊','🐱','🐼','🌸','💫'];
+let avTarget = 'me';
+
+function pickAvatar(who) {
+  avTarget = who;
+  document.getElementById('av-modal-title').textContent = who === 'me' ? 'Tu avatar' : `Avatar de ${S.cfg.them}`;
+  const grid = document.getElementById('av-emoji-grid');
+  grid.innerHTML = AV_EMOJIS.map(e => `
+    <button onclick="setAvatar('${e}')" style="font-size:32px;background:var(--surface2);border:2px solid var(--border);border-radius:12px;aspect-ratio:1;cursor:pointer;transition:.15s;" 
+      onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">${e}</button>
+  `).join('');
+  openModal('m-avatar');
+}
+
+function setAvatar(emoji) {
+  if (avTarget === 'me') { S.avMe = emoji; document.getElementById('av-me').textContent = emoji; }
+  else { S.avThem = emoji; document.getElementById('av-them').textContent = emoji; }
+  save();
+  closeModal('m-avatar');
+  showToast('Avatar actualizado ✨');
+}
+
+// ═══════════════════════ WATCH ═══════════════════════
+const TI = { serie:'📺', pelicula:'🎬', anime:'⛩️', docu:'📽️' };
+const TL = { serie:'Serie', pelicula:'Película', anime:'Anime', docu:'Documental' };
+let wFilter = 'all';
+
+function watchFilter(f, btn) {
+  wFilter = f;
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  renderWatches();
+}
+
+function renderWatches() {
+  let items = S.watches;
+  if (wFilter === 'seen') items = items.filter(i => i.seen);
+  else if (wFilter !== 'all') items = items.filter(i => i.type === wFilter);
+
+  const el = document.getElementById('watch-list');
+  if (!items.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">📺</div><h3>Nada aquí</h3><p>Agregá títulos para ver juntos</p></div>`;
+    return;
+  }
+  el.innerHTML = items.map(w => `
+    <div class="watch-item">
+      <div class="watch-thumb">${TI[w.type]||'🎬'}</div>
+      <div class="watch-info">
+        <div class="watch-title-t">${w.title}</div>
+        <div class="watch-meta">${TL[w.type]||''} · Por ${w.who === 'me' ? S.cfg.me : S.cfg.them}</div>
+        ${w.note ? `<div style="font-size:12px;color:var(--text-muted);font-style:italic;margin-bottom:5px;">"${w.note}"</div>` : ''}
+        <div class="watch-acts">
+          <span class="tag ${w.seen ? 'tag-green' : 'tag-rose'}">${w.seen ? '✅ Visto' : '👁️ Pendiente'}</span>
+          <button class="btn btn-ghost" style="font-size:12px;padding:4px 9px;" onclick="toggleSeen('${w.id}')">${w.seen ? 'Pendiente' : 'Marcar visto'}</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:4px 7px;color:var(--text-dim);" onclick="delWatch('${w.id}')">🗑️</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveWatch() {
+  const t = document.getElementById('wt-title').value.trim();
+  if (!t) { showToast('⚠️ Escribí un título'); return; }
+  S.watches.push({ id: uid(), title: t, type: document.getElementById('wt-type').value, who: document.getElementById('wt-who').value, note: document.getElementById('wt-note').value.trim(), seen: false, date: Date.now() });
+  save();
+  closeModal('m-add-watch');
+  renderWatches();
+  showToast('📺 Agregado a la lista');
+  document.getElementById('wt-title').value = ''; document.getElementById('wt-note').value = '';
+}
+
+function toggleSeen(id) { const w = S.watches.find(x=>x.id===id); if(w){w.seen=!w.seen;save();renderWatches();} }
+function delWatch(id) { S.watches = S.watches.filter(x=>x.id!==id); save(); renderWatches(); showToast('🗑️ Eliminado'); }
+
+// ═══════════════════════ GAMES ═══════════════════════
+const PREGUNTAS = [
+  "¿Cuál es tu recuerdo favorito nuestro hasta ahora?",
+  "¿En qué momento exacto te diste cuenta que te enamoraste de mí?",
+  "¿Cuál es la cosa que más extrañás de mí cuando no hablamos?",
+  "¿Cuál sería nuestro día perfecto juntos?",
+  "¿Qué es lo que más admiras de mí?",
+  "¿Qué canción te recuerda a mí?",
+  "¿Cuál es tu miedo más grande en esta relación?",
+  "¿Qué harías si pudieras estar conmigo ahora mismo?",
+  "¿Cuál es el lugar del mundo donde más querés ir conmigo?",
+  "¿Qué cosa mía te hace sonreír aunque estés enojadx?",
+  "¿Si pudieras cambiar algo de la distancia, qué sería?",
+  "¿Qué te hace sentir más segurix en nuestra relación?",
+  "¿Cuál es el olor que te recuerda a mí?",
+  "¿Cómo imaginás nuestra vida juntos en 5 años?",
+  "¿Qué es lo primero que quieres hacer cuando nos veamos?",
+  "¿Hay algo que nunca me dijiste y querías decirme?",
+  "¿Qué es lo que más te cuesta de la distancia?",
+];
+
+const PREFERIRIAS = [
+  "¿Preferirías un abrazo largo o miles de besos?",
+  "¿Prefirirías vivir en la ciudad o en el campo?",
+  "¿Preferirías viajar al pasado o al futuro?",
+  "¿Prefirirías ser famosísimx o muy feliz en privado?",
+  "¿Preferirías despertar en París o en Tokio?",
+  "¿Prefirirías no dormir jamás o dormir 12 horas siempre?",
+  "¿Preferirías poder volar o ser invisible?",
+  "¿Prefirirías ver el atardecer o el amanecer juntos?",
+  "¿Preferirías una sorpresa de viaje o una cena íntima?",
+  "¿Prefirirías recordar todo o poder olvidar lo que quieras?",
+  "¿Preferirías hablar todos los días poco tiempo o una vez a la semana muchísimo?",
+  "¿Prefirirías vivir en el lugar donde vivís vos o donde vivo yo?",
+];
+
+const VERDADES = [
+  "🎲 Dato: Cantá tu canción favorita por 30 segundos en audio",
+  "💬 Verdad: ¿Cuál fue el momento más incómodo entre nosotros?",
+  "🎲 Dato: Hacé una voz de personaje de película",
+  "💬 Verdad: ¿Alguna vez mentiste para no herirme?",
+  "🎲 Dato: Bailá una canción y mostralo por videollamada",
+  "💬 Verdad: ¿Qué es lo que nunca me dijiste y querías?",
+  "🎲 Dato: Hacé 10 saltos sin parar ahora mismo",
+  "💬 Verdad: ¿Cuál es tu fantasía de vida con nosotros?",
+  "🎲 Dato: Mandá un audio hablando muy lento y dramático",
+  "💬 Verdad: ¿Cuándo fue la última vez que lloraste pensando en mí?",
+  "🎲 Dato: Describite con solo 3 emojis",
+  "💬 Verdad: ¿Qué es lo más raro que hiciste pensando en mí?",
+];
+
+const RULETA = [
+  "🌙 Vean juntos una película esta semana por videollamada",
+  "📝 Escríbanse una carta de amor y léansela en video",
+  "🎵 Armen una playlist compartida en Spotify",
+  "🍕 Pidan la misma comida y coman juntos por video",
+  "📸 Compartan una foto de lo que están viendo ahora",
+  "🎮 Jueguen un juego online juntos esta noche",
+  "🌅 Vean el atardecer juntos por video esta semana",
+  "💌 Mándense 5 cosas que admiran del otro ahora",
+  "🗺️ Planifiquen el primer viaje que harán cuando se vean",
+  "🎁 Háganse un regalo virtual sorpresa esta semana",
+  "☕ Tomen un café/mate juntos por videollamada",
+  "🎭 Elijan un personaje famoso y actúen como ellos en la próxima llamada",
+];
+
+const RETOS = [
+  "🏃 Corran: ¿quién llega primero a tocar la ventana más cercana?",
+  "😂 Concurso de caras graciosas: gana quien ría primero",
+  "🎵 Cada uno tararea una canción y el otro adivina el título",
+  "🤸 Hagan el mismo movimiento de baile al mismo tiempo",
+  "📚 Lean el mismo texto lo más rápido posible, gana quien termine",
+  "🥄 Pongan una cuchara en la nariz por más tiempo sin que caiga",
+  "🍫 El que pierde el siguiente reto le envía algo dulce",
+  "🎭 Imiten al otro hablando. El que se ría primero pierde",
+];
+
+const TRIVIA = [
+  { q:"¿Cuál es el color favorito de tu pareja?", h:"Preguntale después si no sabés 😄" },
+  { q:"¿Cuál fue el primer lugar donde salieron o hablaron?", h:"Recuerden ese primer momento" },
+  { q:"¿Cuál es el plato favorito de tu pareja?", h:"La comida dice mucho" },
+  { q:"¿En qué película lloró tu pareja?", h:"Los buenos llantos cuentan" },
+  { q:"¿Cuál es el nombre del mejor amigx de tu pareja?", h:"¿Lo conocen?" },
+  { q:"¿Cuál es el mayor miedo de tu pareja?", h:"Tómense un momento para pensar" },
+  { q:"¿Cuál es la app que más usa tu pareja?", h:"Observación nivel detectivx 🔍" },
+  { q:"¿Cómo se llama la mascota que tiene o tuvo tu pareja?", h:"Puede no tener, ojo" },
+];
+
+function playGame(type) {
+  const titles = {
+    preguntas:'❓ Preguntas íntimas', preferirias:'⚖️ ¿Preferirías?', verdad:'🎲 Verdad o Dato',
+    ruleta:'🎡 Ruleta de amor', retos:'🏆 Retos en pareja', trivia:'🧠 Trivia de pareja',
+    dibuja:'🎨 Adivina el dibujo', bucket:'📋 Bucket List',
+  };
+  document.getElementById('game-title').textContent = titles[type] || '🎮 Juego';
+  const c = document.getElementById('game-content');
+
+  if (type === 'bucket') { renderBucket(c); openModal('m-game'); return; }
+  if (type === 'dibuja') { renderDibuja(c); openModal('m-game'); return; }
+
+  const pools = { preguntas:PREGUNTAS, preferirias:PREFERIRIAS, verdad:VERDADES, ruleta:RULETA, retos:RETOS, trivia:TRIVIA };
+  const pool = [...(pools[type]||PREGUNTAS)].sort(()=>Math.random()-.5);
+  let i = 0;
+  const isTrivia = type === 'trivia';
+
+  const getText = () => isTrivia ? pool[i%pool.length].q : pool[i%pool.length];
+  const getHint = () => isTrivia ? pool[i%pool.length].h : '';
+
+  if (type === 'ruleta') {
+    c.innerHTML = `
+      <div class="ruleta-card" id="ruleta-card" onclick="spinRuleta()">
+        <div style="font-size:40px;margin-bottom:12px;">🎡</div>
+        <div class="ruleta-activity" id="ruleta-text">Tocá para girar la ruleta</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:12px;">Toca para otra actividad</div>
+      </div>
+    `;
+    window.spinRuleta = () => {
+      const a = RULETA[Math.floor(Math.random()*RULETA.length)];
+      document.getElementById('ruleta-text').textContent = a;
+    };
+    openModal('m-game'); return;
+  }
+
+  c.innerHTML = `
+    <div class="game-play-card" id="gpc" onclick="nextCard()">
+      <div class="game-q" id="gq">${getText()}</div>
+      ${isTrivia ? `<div class="trivia-hint" id="gh">${getHint()}</div>` : ''}
+      <div class="game-hint-lbl" style="margin-top:12px;">Tocá para la siguiente carta 🃏</div>
+    </div>
+    <div class="game-counter" id="gc">Carta 1 de ${pool.length}</div>
+  `;
+
+  window.nextCard = () => {
+    i++;
+    document.getElementById('gq').textContent = getText();
+    document.getElementById('gc').textContent = `Carta ${(i%pool.length)+1} de ${pool.length}`;
+    if (isTrivia && document.getElementById('gh')) document.getElementById('gh').textContent = getHint();
+  };
+
+  openModal('m-game');
+}
+
+function renderDibuja(c) {
+  const ideas = ['🏠 Una casa en la montaña','🐱 Un gato durmiendo','🚀 Un cohete en el espacio','🌊 Una ola del mar','🦄 Un unicornio','🍕 Una pizza perfecta','🌈 Un arcoíris','🦋 Una mariposa gigante','🏔️ Un volcán activo','🎸 Una guitarra eléctrica'];
+  c.innerHTML = `
+    <p style="text-align:center;color:var(--text-muted);font-size:13.5px;line-height:1.6;margin-bottom:14px;">
+      Abrí un bloc de notas o papel, dibujá algo en <b style="color:var(--text)">60 segundos</b> y mostráselo a tu pareja por video. ¿No sabés qué dibujar? 👇
+    </p>
+    <div class="game-play-card" id="dibuja-card">
+      <div class="game-q" id="dibuja-text">${ideas[0]}</div>
+      <div class="game-hint-lbl" style="margin-top:10px;">Tocá para otra idea 🎲</div>
+    </div>
+  `;
+  let di = 0;
+  document.getElementById('dibuja-card').onclick = () => {
+    di = (di+1)%ideas.length;
+    document.getElementById('dibuja-text').textContent = ideas[di];
+  };
+}
+
+function renderBucket(c) {
+  const draw = () => {
+    const items = S.buckets;
+    c.innerHTML = `
+      <div style="margin-bottom:13px;max-height:260px;overflow-y:auto;">
+        ${!items.length ? '<p style="text-align:center;color:var(--text-muted);padding:20px 0;">¡Agreguen sueños para cumplir juntos!</p>' :
+          items.map(b => `
+            <div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border);">
+              <span style="font-size:20px;cursor:pointer;" onclick="toggleBucket('${b.id}')">${b.done?'✅':'⬜'}</span>
+              <span style="flex:1;font-size:14px;${b.done?'text-decoration:line-through;color:var(--text-muted)':''}">${b.text}</span>
+              <button class="btn btn-ghost" style="padding:4px;font-size:12px;" onclick="delBucket('${b.id}')">🗑️</button>
+            </div>
+          `).join('')}
+      </div>
+      <div style="display:flex;gap:8px;">
+        <input class="field" id="bi" placeholder="Ej: Ver el atardecer en Mendoza" style="flex:1;">
+        <button class="btn btn-primary" onclick="addBucket()">+</button>
+      </div>
+    `;
+  };
+  draw();
+
+  window.addBucket = () => {
+    const v = document.getElementById('bi').value.trim();
+    if (!v) return;
+    S.buckets.push({ id: uid(), text: v, done: false });
+    save(); draw();
+  };
+  window.toggleBucket = (id) => {
+    const b = S.buckets.find(x=>x.id===id);
+    if(b){b.done=!b.done;save();draw();}
+  };
+  window.delBucket = (id) => {
+    S.buckets = S.buckets.filter(x=>x.id!==id);
+    save(); draw();
+  };
+}
+
+// ═══════════════════════ LOVE ═══════════════════════
+function sendLove() {
+  const t = document.getElementById('love-input').value.trim();
+  if (!t) { showToast('✏️ Escribí algo primero'); return; }
+  S.love.unshift({ id: uid(), text: t, from: S.cfg.me, date: new Date().toLocaleDateString('es-AR'), ts: Date.now() });
+  save();
+  document.getElementById('love-input').value = '';
+  renderLove();
+  showToast('💌 Nota enviada con amor 💕');
+}
+
+function scheduleMsg() { openModal('m-schedule'); }
+
+function renderLove() {
+  renderReminders();
+  const el = document.getElementById('love-list');
+  if (!S.love.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico">💌</div><h3>Sin notas aún</h3><p>Escribí tu primera nota de amor arriba</p></div>`;
+    return;
+  }
+  el.innerHTML = S.love.slice(0,15).map(m => `
+    <div class="letter-card">
+      <div class="letter-head">
+        <span class="letter-from">De: ${m.from}</span>
+        <span class="letter-date">${m.date}</span>
+      </div>
+      <div class="letter-body">${m.text}</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════ REMINDERS ═══════════════════════
+function renderReminders() {
+  const el = document.getElementById('reminders-list');
+  if (!S.reminders.length) {
+    el.innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:8px 0 12px;">No hay recordatorios aún.</p>`;
+    return;
+  }
+  const sorted = [...S.reminders].sort((a,b) => new Date(a.date) - new Date(b.date));
+  el.innerHTML = sorted.map(r => {
+    const d = new Date(r.date + 'T00:00:00');
+    const diff = Math.ceil((d - Date.now()) / 864e5);
+    const lbl = diff < 0 ? 'Ya pasó' : diff === 0 ? '¡Hoy! 🎉' : `En ${diff} días`;
+    return `
+      <div class="rem-item">
+        <div class="rem-dot" style="background:${r.color}"></div>
+        <div class="rem-info">
+          <div class="rem-title">${r.title}</div>
+          <div class="rem-date">${d.toLocaleDateString('es-AR')} · ${lbl}</div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:13px;" onclick="delReminder('${r.id}')">🗑️</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function saveReminder() {
+  const t = document.getElementById('rem-title').value.trim();
+  const d = document.getElementById('rem-date').value;
+  if (!t || !d) { showToast('⚠️ Completá todos los campos'); return; }
+  S.reminders.push({ id: uid(), title: t, date: d, color: document.getElementById('rem-color').value });
+  save();
+  closeModal('m-add-reminder');
+  renderReminders();
+  showToast('🔔 Recordatorio agregado');
+  document.getElementById('rem-title').value = ''; document.getElementById('rem-date').value = '';
+}
+
+function delReminder(id) { S.reminders = S.reminders.filter(r=>r.id!==id); save(); renderReminders(); }
+
+// ═══════════════════════ GALLERY ═══════════════════════
+function renderGallery() {
+  document.getElementById('gal-count').textContent = S.gallery.length;
+  const el = document.getElementById('gal-grid');
+  const items = S.gallery.map(g => `
+    <div class="gal-item" onclick="viewImg('${g.id}')">
+      ${g.type==='img' ? `<img src="${g.src}" alt="Recuerdo">` : `<div class="gal-emoji">${g.src}</div>`}
+      ${g.caption ? `<div class="gal-caption">${g.caption}</div>` : ''}
+    </div>
+  `).join('');
+  el.innerHTML = items + `<div class="gal-item gal-add" onclick="addPhoto()"><span>+</span><small>Agregar</small></div>`;
+}
+
+function addPhoto() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+  inp.onchange = e => {
+    [...e.target.files].forEach(f => {
+      const r = new FileReader();
+      r.onload = ev => {
+        const cap = prompt('Descripción o fecha del recuerdo (opcional):') || '';
+        S.gallery.push({ id: uid(), type: 'img', src: ev.target.result, caption: cap, date: Date.now() });
+        save(); renderGallery();
+        showToast('📸 Recuerdo agregado 💕');
+      };
+      r.readAsDataURL(f);
+    });
+  };
+  inp.click();
+}
+
+function viewImg(id) {
+  const g = S.gallery.find(x=>x.id===id);
+  if (!g) return;
+  if (g.type === 'img') {
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;';
+    ov.onclick = () => ov.remove();
+    ov.innerHTML = `<img src="${g.src}" style="max-width:95vw;max-height:85vh;border-radius:12px;object-fit:contain;">
+      ${g.caption ? `<p style="color:rgba(255,255,255,.7);margin-top:12px;font-size:14px;">${g.caption}</p>` : ''}
+      <p style="color:rgba(255,255,255,.4);margin-top:8px;font-size:12px;">Toca para cerrar</p>`;
+    document.body.appendChild(ov);
+  }
+}
+
+// ═══════════════════════ GIFTS ═══════════════════════
+const PICO = { mercadopago:'💳', paypal:'🅿️', uala:'💜', transferencia:'🏦', amazon:'📦', cafecito:'☕', otro:'🔗' };
+const PBGS = { mercadopago:'rgba(0,177,234,.15)', paypal:'rgba(0,48,135,.2)', uala:'rgba(139,92,246,.15)', transferencia:'rgba(5,150,105,.15)', amazon:'rgba(255,153,0,.15)', cafecito:'rgba(139,90,43,.15)', otro:'rgba(107,114,128,.15)' };
+
+function renderGifts() {
+  const wl = document.getElementById('wishlist-items');
+  if (!S.wishes.length) {
+    wl.innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:8px 0;">Nada en la lista aún.</p>`;
+  } else {
+    wl.innerHTML = S.wishes.map(w => `
+      <div class="wish-row">
+        <span style="font-size:20px;">${w.done?'🎁':'⭐'}</span>
+        <span style="flex:1;font-size:14px;${w.done?'text-decoration:line-through;color:var(--text-muted)':''}">${w.text}</span>
+        <button class="btn btn-ghost" style="font-size:12px;padding:4px 7px;" onclick="toggleWish('${w.id}')">${w.done?'↩️':'✓'}</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:4px;" onclick="delWish('${w.id}')">🗑️</button>
+      </div>
+    `).join('');
+  }
+
+  const gl = document.getElementById('gift-list');
+  if (!S.payments.length) {
+    gl.innerHTML = `<p style="color:var(--text-muted);font-size:13px;padding:8px 0 12px;">Agregá métodos para que tu pareja pueda mandarte regalos o dinero.</p>`;
+    return;
+  }
+  gl.innerHTML = S.payments.map(p => `
+    <div class="gift-item" onclick="usePayment('${p.id}')">
+      <div class="gift-ico" style="background:${PBGS[p.platform]||'rgba(107,114,128,.15)'};">${PICO[p.platform]||'🔗'}</div>
+      <div>
+        <div class="gift-name">${p.platform.charAt(0).toUpperCase()+p.platform.slice(1)}</div>
+        <div class="gift-sub">${p.owner==='me'?S.cfg.me:S.cfg.them} · ${p.handle}</div>
+      </div>
+      <span class="gift-arrow">↗</span>
+    </div>
+  `).join('');
+}
+
+function addWish() {
+  const v = prompt('¿Qué querés que te regalen? 🎁');
+  if (!v?.trim()) return;
+  S.wishes.push({ id: uid(), text: v.trim(), done: false });
+  save(); renderGifts();
+  showToast('⭐ Agregado a tu lista');
+}
+function toggleWish(id) { const w=S.wishes.find(x=>x.id===id); if(w){w.done=!w.done;save();renderGifts();} }
+function delWish(id) { S.wishes=S.wishes.filter(x=>x.id!==id); save(); renderGifts(); }
+
+function savePayment() {
+  const h = document.getElementById('pay-handle').value.trim();
+  if (!h) { showToast('⚠️ Ingresá un alias o enlace'); return; }
+  S.payments.push({ id: uid(), platform: document.getElementById('pay-platform').value, handle: h, owner: document.getElementById('pay-owner').value });
+  save();
+  closeModal('m-add-payment');
+  renderGifts();
+  showToast('💳 Método guardado');
+  document.getElementById('pay-handle').value = '';
+}
+
+function usePayment(id) {
+  const p = S.payments.find(x=>x.id===id);
+  if (!p) return;
+  if (p.handle.startsWith('http')) { window.open(p.handle, '_blank'); }
+  else { navigator.clipboard?.writeText(p.handle).then(()=>showToast('📋 Alias copiado al portapapeles')).catch(()=>showToast('Alias: ' + p.handle)); }
+}
+
+// ═══════════════════════ MODALS ═══════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+});
+
+// ═══════════════════════ TOAST ═══════════════════════
+let tt;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(tt); tt = setTimeout(() => el.classList.remove('on'), 2800);
+}
+
+// ═══════════════════════ UTILS ═══════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+// ═══════════════════════ INIT ═══════════════════════
+load();
+qIdx = Math.floor(Math.random() * QUOTES.length);
+document.getElementById('daily-quote').textContent = QUOTES[qIdx];
+renderHome();
+renderWatches();
+
+// Default reminders if empty
+if (!S.reminders.length) {
+  S.reminders = [
+    { id: uid(), title: 'Aniversario 🎉', date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()+30).toISOString().split('T')[0], color: '#E8799A' },
+    { id: uid(), title: 'Próxima videollamada 📞', date: new Date(new Date().getTime()+3*864e5).toISOString().split('T')[0], color: '#6AABDC' },
+  ];
+  save();
+}
+
+// Default watch items if empty
+if (!S.watches.length) {
+  S.watches = [
+    { id: uid(), title: 'Your Name (Kimi no Na wa)', type: 'anime', who: 'them', note: 'Dicen que es perfecta para parejas a distancia', seen: false, date: Date.now() },
+    { id: uid(), title: 'Amélie', type: 'pelicula', who: 'me', note: 'Francesa, hermosa y romántica', seen: false, date: Date.now() },
+  ];
+  save();
+}
+
+// ═══════════════════════ SCHEDULED MESSAGES ═══════════════════════
+function renderScheduledPending() {
+  const el = document.getElementById('sch-pending');
+  if (!el) return;
+  const items = (S.scheduled || []).filter(x => !x.fired).sort((a,b)=>a.ts-b.ts);
+  if (!items.length) { el.innerHTML=''; return; }
+  el.innerHTML = `<div style="margin-bottom:8px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Programados pendientes</div>`
+    + items.map(i=>`
+      <div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:18px;">⏰</span>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.text}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${new Date(i.ts).toLocaleString('es-AR')}</div>
+        </div>
+        <button class="btn btn-ghost" style="font-size:12px;padding:4px;" onclick="delScheduled('${i.id}')">🗑️</button>
+      </div>`).join('');
+}
+
+function saveScheduled() {
+  const text = document.getElementById('sch-text').value.trim();
+  const dt = document.getElementById('sch-dt').value;
+  if (!text || !dt) { showToast('⚠️ Completá todos los campos'); return; }
+  const ts = new Date(dt).getTime();
+  if (ts <= Date.now()) { showToast('⚠️ Elegí una fecha futura'); return; }
+  if (!S.scheduled) S.scheduled = [];
+  const id = uid();
+  S.scheduled.push({ id, text, ts, for: document.getElementById('sch-for').value, fired: false });
+  save();
+  // Try to schedule via Notifications API
+  scheduleNotification(id, text, ts);
+  renderScheduledPending();
+  document.getElementById('sch-text').value = '';
+  document.getElementById('sch-dt').value = '';
+  showToast('⏰ Mensaje programado 💕');
+}
+
+function delScheduled(id) {
+  if (!S.scheduled) return;
+  S.scheduled = S.scheduled.filter(x=>x.id!==id);
+  save(); renderScheduledPending();
+}
+
+async function scheduleNotification(id, text, ts) {
+  if (!('Notification' in window)) return;
+  let perm = Notification.permission;
+  if (perm === 'default') perm = await Notification.requestPermission();
+  if (perm !== 'granted') { showToast('⚠️ Activá notificaciones para recibir el mensaje'); return; }
+  const delay = ts - Date.now();
+  setTimeout(() => {
+    new Notification('💕 Contigo — Mensaje de amor', { body: text, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', tag: id });
+    const item = (S.scheduled||[]).find(x=>x.id===id);
+    if (item) { item.fired = true; save(); }
+  }, delay);
+}
+
+// Check pending scheduled on startup
+function checkScheduled() {
+  if (!S.scheduled) return;
+  const now = Date.now();
+  S.scheduled.forEach(item => {
+    if (!item.fired && item.ts > now) scheduleNotification(item.id, item.text, item.ts);
+    else if (!item.fired && item.ts <= now) { item.fired = true; }
+  });
+  save();
+}
+
+// ═══════════════════════ PWA INSTALL PROMPT ═══════════════════════
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  if (document.getElementById('install-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = `
+    position:fixed;top:calc(var(--header-h) + 8px);left:50%;transform:translateX(-50%);
+    background:linear-gradient(135deg,rgba(232,121,154,.18),rgba(196,149,106,.13));
+    border:1px solid rgba(232,121,154,.35);border-radius:50px;
+    padding:9px 18px;display:flex;align-items:center;gap:10px;
+    z-index:150;max-width:calc(480px - 32px);width:calc(100% - 32px);
+    box-shadow:0 4px 24px rgba(0,0,0,.4);backdrop-filter:blur(12px);
+    animation:fadeUp .3s var(--ease);
+  `;
+  banner.innerHTML = `
+    <span style="font-size:20px;">💕</span>
+    <span style="flex:1;font-size:13px;font-weight:600;color:var(--text);">Instalá Contigo en tu celu</span>
+    <button onclick="installPWA()" style="background:var(--accent);color:white;border:none;border-radius:50px;padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;">Instalar</button>
+    <button onclick="document.getElementById('install-banner').remove()" style="background:none;border:none;color:var(--text-muted);font-size:17px;cursor:pointer;padding:2px 4px;">✕</button>
+  `;
+  document.getElementById('app').appendChild(banner);
+}
+
+async function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('install-banner')?.remove();
+  if (outcome === 'accepted') showToast('🎉 ¡Contigo instalada!');
+}
+
+// ═══════════════════════ ONLINE/OFFLINE INDICATOR ═══════════════════════
+function updateOnline() {
+  const isOnline = navigator.onLine;
+  if (!isOnline) showToast('📵 Sin conexión — modo offline activado');
+}
+window.addEventListener('online', () => showToast('✅ Conexión restaurada'));
+window.addEventListener('offline', () => showToast('📵 Sin conexión — todo guardado localmente'));
+
+// ═══════════════════════ SW REGISTRATION ═══════════════════════
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      const reg = await navigator.serviceWorker.register('sw.js');
+      reg.addEventListener('updatefound', () => {
+        const nw = reg.installing;
+        nw.addEventListener('statechange', () => {
+          if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+            showToast('🔄 Actualización disponible — recargá la app');
+          }
+        });
+      });
+    } catch(e) {}
+  });
+}
+
+// ═══════════════════════ OPEN SCHEDULED MODAL ENRICH ═══════════════════════
+const _origOpenModal = openModal;
+// Patch openModal to render pending when opening schedule
+const _openModalOrig = openModal;
+window.addEventListener('DOMContentLoaded', () => {});
+// Override via direct override
+(function() {
+  const orig = window.openModal;
+  window.openModal = function(id) {
+    orig(id);
+    if (id === 'm-schedule') {
+      const now = new Date();
+      now.setMinutes(now.getMinutes() + 30);
+      document.getElementById('sch-dt').value = now.toISOString().slice(0,16);
+      renderScheduledPending();
+    }
+  };
+})();
+
+checkScheduled();
+
+// ══════════════════ INIT ══════════════════
+loadLocal();
+qIdx = Math.floor(Math.random() * QUOTES.length);
+document.getElementById('daily-quote').textContent = QUOTES[qIdx];
+
+// Ocultar app hasta que auth confirme sesión
+document.getElementById('app').style.display = 'none';
+
+// Defaults si no hay datos
+if (!S.reminders.length) {
+  S.reminders = [
+    { id: uid(), title: 'Aniversario 🎉', date: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate()+30).toISOString().split('T')[0], color: '#E8799A' },
+    { id: uid(), title: 'Próxima videollamada 📞', date: new Date(new Date().getTime()+3*864e5).toISOString().split('T')[0], color: '#6AABDC' },
+  ];
+  saveLocal();
+}
+if (!S.watches.length) {
+  S.watches = [
+    { id: uid(), title: 'Your Name (Kimi no Na wa)', type: 'anime', who: 'them', note: 'Dicen que es perfecta para parejas a distancia', seen: false, date: Date.now() },
+    { id: uid(), title: 'Amélie', type: 'pelicula', who: 'me', note: 'Francesa, hermosa y romántica', seen: false, date: Date.now() },
+  ];
+  saveLocal();
+}</script>
+</body>
+</html>
