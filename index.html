@@ -44,6 +44,31 @@
       --ease: cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    body.light-mode {
+      --bg: #FDF6F8;
+      --surface: #FFFFFF;
+      --surface2: #F5EDF0;
+      --surface3: #EDE0E4;
+      --border: #E8D5DA;
+      --accent: #D4587A;
+      --accent2: #B07848;
+      --accent-dim: rgba(212,88,122,0.1);
+      --accent2-dim: rgba(176,120,72,0.1);
+      --text: #1A0F13;
+      --text-muted: #7A5560;
+      --text-dim: #B8909A;
+    }
+    body.light-mode::before {
+      background:
+        radial-gradient(ellipse 70% 45% at 15% 5%, rgba(212,88,122,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 55% at 85% 95%, rgba(176,120,72,0.05) 0%, transparent 60%);
+    }
+    body.light-mode .app-header { background: rgba(253,246,248,0.94); }
+    body.light-mode .bottom-nav { background: rgba(255,255,255,0.97); }
+    body.light-mode #auth-screen { background: var(--bg); }
+    body.light-mode #onboard-screen { background: var(--bg); }
+    body.light-mode select.field option { background: #fff; color: #1A0F13; }
+
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
     body {
@@ -53,6 +78,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      transition: background .35s var(--ease), color .35s var(--ease);
     }
 
     body::before {
@@ -848,7 +874,7 @@
     <div class="ig"><label class="label">Zona horaria de tu pareja</label><select class="field" id="cfg-tz-them"></select></div>
     <div class="divider"></div>
     <div class="trow"><div class="trow-info"><div class="tl">Notificaciones</div><div class="td">Recordatorios y alertas</div></div><div class="toggle on" id="tog-notif" onclick="this.classList.toggle('on')"></div></div>
-    <div class="trow" style="border:none;"><div class="trow-info"><div class="tl">Modo oscuro siempre</div><div class="td">Ya activado por defecto 🌙</div></div><div class="toggle on"></div></div>
+    <div class="trow" style="border:none;"><div class="trow-info"><div class="tl" id="theme-toggle-lbl">🌙 Modo oscuro</div><div class="td" id="theme-toggle-desc">Fondo oscuro, más romántico</div></div><div class="toggle on" id="tog-theme" onclick="toggleTheme()"></div></div>
     <div class="divider"></div>
     <div style="display:flex;gap:9px;">
       <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-settings')">Cancelar</button>
@@ -989,6 +1015,59 @@
     <div class="divider"></div>
     <button class="btn btn-secondary btn-full" onclick="logout()" style="color:#E87979;border-color:rgba(232,121,154,.3);">Cerrar sesión</button>
     <button class="btn btn-ghost btn-full" onclick="closeModal('m-user-menu')" style="margin-top:6px;">Cerrar</button>
+  </div>
+</div>
+
+<!-- Add wish -->
+<div class="overlay" id="m-add-wish">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🌟 Agregar deseo</div>
+    <p style="font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:16px;line-height:1.55;">¿Qué querés que te regalen o que hagan juntos? Tu pareja lo verá 💕</p>
+    <div class="ig"><label class="label">Tu deseo</label><input class="field" id="wish-inp" placeholder="Ej: Un viaje a la playa juntos ☀️" maxlength="120"></div>
+    <div class="ig"><label class="label">Categoría</label>
+      <select class="field" id="wish-cat">
+        <option value="regalo">🎁 Regalo</option>
+        <option value="experiencia">✨ Experiencia juntos</option>
+        <option value="viaje">✈️ Viaje</option>
+        <option value="comida">🍕 Comida / cena</option>
+        <option value="otro">💬 Otro</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-add-wish')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveWish()">Agregar ⭐</button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo caption -->
+<div class="overlay" id="m-photo-caption">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📸 Nuevo recuerdo</div>
+    <div style="text-align:center;margin-bottom:16px;">
+      <img id="caption-preview" src="" style="max-width:100%;max-height:200px;border-radius:var(--radius);object-fit:cover;border:1px solid var(--border);">
+    </div>
+    <div class="ig"><label class="label">Descripción (opcional)</label><input class="field" id="caption-inp" placeholder="Ej: Nuestra primera videollamada 💕" maxlength="100"></div>
+    <div class="ig"><label class="label">Fecha</label><input class="field" type="date" id="caption-date"></div>
+    <div style="display:flex;gap:9px;">
+      <button class="btn btn-secondary" style="flex:1" onclick="cancelPhoto()">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="confirmPhoto()">Guardar 💕</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete photo confirm -->
+<div class="overlay" id="m-delete-photo">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="text-align:center;margin-bottom:18px;">
+      <div style="font-size:44px;margin-bottom:10px;">🗑️</div>
+      <div class="modal-title" style="margin-bottom:6px;">Eliminar recuerdo</div>
+      <p id="del-photo-msg" style="font-size:13.5px;color:var(--text-muted);line-height:1.55;"></p>
+    </div>
+    <div id="del-photo-actions" style="display:flex;gap:9px;"></div>
   </div>
 </div>
 
@@ -1405,6 +1484,7 @@ async function enterApp() {
   attachSyncListener();
   attachLatidoListener();
   attachPresenceListener();
+  attachDeleteRequestListener();
   renderHome();
   renderWatches();
 }
@@ -1894,42 +1974,171 @@ function renderGallery() {
   const items = S.gallery.map(g => `
     <div class="gal-item" onclick="viewImg('${g.id}')">
       ${g.type==='img' ? `<img src="${g.src}" alt="Recuerdo">` : `<div class="gal-emoji">${g.src}</div>`}
-      ${g.caption ? `<div class="gal-caption">${g.caption}</div>` : ''}
+      <div class="gal-caption" style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${g.caption || ''}</span>
+        <button onclick="event.stopPropagation();requestDeletePhoto('${g.id}')"
+          style="background:rgba(232,121,154,.18);border:none;border-radius:50%;width:22px;height:22px;
+          display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px;flex-shrink:0;
+          color:var(--accent);transition:.2s;" title="Eliminar">✕</button>
+      </div>
     </div>
   `).join('');
   el.innerHTML = items + `<div class="gal-item gal-add" onclick="addPhoto()"><span>+</span><small>Agregar</small></div>`;
 }
 
+// Pending photo data while caption modal is open
+let _pendingPhoto = null;
+
 function addPhoto() {
   const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = false;
   inp.onchange = e => {
-    [...e.target.files].forEach(f => {
-      const r = new FileReader();
-      r.onload = ev => {
-        const cap = prompt('Descripción o fecha del recuerdo (opcional):') || '';
-        S.gallery.push({ id: uid(), type: 'img', src: ev.target.result, caption: cap, date: Date.now() });
-        save(); renderGallery();
-        showToast('📸 Recuerdo agregado 💕');
-      };
-      r.readAsDataURL(f);
-    });
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      _pendingPhoto = { src: ev.target.result };
+      document.getElementById('caption-preview').src = ev.target.result;
+      // Default date = today
+      document.getElementById('caption-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('caption-inp').value = '';
+      openModal('m-photo-caption');
+    };
+    r.readAsDataURL(f);
   };
   inp.click();
 }
 
+function cancelPhoto() {
+  _pendingPhoto = null;
+  closeModal('m-photo-caption');
+}
+
+function confirmPhoto() {
+  if (!_pendingPhoto) return;
+  const cap = document.getElementById('caption-inp').value.trim();
+  const date = document.getElementById('caption-date').value;
+  S.gallery.push({
+    id: uid(),
+    type: 'img',
+    src: _pendingPhoto.src,
+    caption: cap,
+    dateLabel: date,
+    date: Date.now(),
+    addedBy: currentUser?.uid || 'me',
+  });
+  _pendingPhoto = null;
+  saveLocal(); // No sincronizar fotos (son base64 muy pesadas)
+  renderGallery();
+  closeModal('m-photo-caption');
+  showToast('📸 Recuerdo guardado 💕');
+}
+
 function viewImg(id) {
   const g = S.gallery.find(x=>x.id===id);
+  if (!g || g.type !== 'img') return;
+  const ov = document.createElement('div');
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+  ov.innerHTML = `
+    <img src="${g.src}" style="max-width:100%;max-height:78vh;border-radius:14px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,.6);">
+    ${g.caption ? `<p style="color:rgba(255,255,255,.8);margin-top:14px;font-size:15px;font-family:var(--font-display);font-style:italic;text-align:center;">${g.caption}</p>` : ''}
+    ${g.dateLabel ? `<p style="color:rgba(255,255,255,.4);margin-top:5px;font-size:12px;">${new Date(g.dateLabel+'T00:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'})}</p>` : ''}
+    <div style="display:flex;gap:10px;margin-top:18px;">
+      <button onclick="this.closest('[data-ov]').remove()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:white;border-radius:50px;padding:9px 20px;font-size:13px;font-family:var(--font-body);font-weight:700;cursor:pointer;">Cerrar</button>
+      <button onclick="this.closest('[data-ov]').remove();requestDeletePhoto('${g.id}')" style="background:rgba(232,121,154,.2);border:1px solid rgba(232,121,154,.35);color:var(--accent);border-radius:50px;padding:9px 20px;font-size:13px;font-family:var(--font-body);font-weight:700;cursor:pointer;">🗑️ Eliminar</button>
+    </div>
+  `;
+  ov.dataset.ov = '1';
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+function requestDeletePhoto(id) {
+  const g = S.gallery.find(x=>x.id===id);
   if (!g) return;
-  if (g.type === 'img') {
-    const ov = document.createElement('div');
-    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;';
-    ov.onclick = () => ov.remove();
-    ov.innerHTML = `<img src="${g.src}" style="max-width:95vw;max-height:85vh;border-radius:12px;object-fit:contain;">
-      ${g.caption ? `<p style="color:rgba(255,255,255,.7);margin-top:12px;font-size:14px;">${g.caption}</p>` : ''}
-      <p style="color:rgba(255,255,255,.4);margin-top:8px;font-size:12px;">Toca para cerrar</p>`;
-    document.body.appendChild(ov);
+
+  const myPhoto = g.addedBy === (currentUser?.uid || 'me');
+  const hasPartner = !!partnerUid;
+
+  if (!hasPartner || myPhoto) {
+    // Sin pareja vinculada o foto mía → borrar directo
+    document.getElementById('del-photo-msg').textContent = myPhoto
+      ? '¿Eliminás este recuerdo? No se puede deshacer.'
+      : '¿Seguro que querés eliminar este recuerdo?';
+    document.getElementById('del-photo-actions').innerHTML = `
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-delete-photo')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1;background:#E87979;" onclick="confirmDeletePhoto('${id}')">Eliminar</button>
+    `;
+  } else {
+    // Foto de la pareja → enviar solicitud vía Firebase
+    document.getElementById('del-photo-msg').textContent =
+      `Esta foto fue agregada por ${S.cfg.them}. Se le enviará una solicitud para aprobar la eliminación. ¿Querés pedirlo?`;
+    document.getElementById('del-photo-actions').innerHTML = `
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-delete-photo')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="sendDeleteRequest('${id}')">Pedir eliminar 📩</button>
+    `;
   }
+  openModal('m-delete-photo');
+}
+
+function confirmDeletePhoto(id) {
+  S.gallery = S.gallery.filter(x=>x.id!==id);
+  saveLocal();
+  renderGallery();
+  closeModal('m-delete-photo');
+  showToast('🗑️ Recuerdo eliminado');
+}
+
+function sendDeleteRequest(id) {
+  if (coupleId && currentUser) {
+    coupleRef('deleteRequests/' + id).set({
+      photoId: id,
+      requestedBy: currentUser.uid,
+      requestedByName: S.cfg.me,
+      ts: Date.now(),
+    });
+  }
+  closeModal('m-delete-photo');
+  showToast('📩 Solicitud enviada a ' + S.cfg.them);
+}
+
+// Escuchar solicitudes de borrado entrantes
+function attachDeleteRequestListener() {
+  if (!coupleId || !currentUser) return;
+  coupleRef('deleteRequests').on('child_added', snap => {
+    const req = snap.val();
+    if (!req || req.requestedBy === currentUser.uid) return;
+    const g = S.gallery.find(x=>x.id===req.photoId);
+    if (!g) { snap.ref.remove(); return; }
+    // Mostrar notificación toast con acción
+    showToast(`📩 ${req.requestedByName} pide eliminar una foto`);
+    // Modal de aprobación
+    setTimeout(() => {
+      document.getElementById('del-photo-msg').innerHTML =
+        `<b>${req.requestedByName}</b> pide eliminar este recuerdo:<br><br>
+        <img src="${g.src}" style="max-width:100%;max-height:120px;border-radius:10px;object-fit:cover;margin-top:4px;">
+        ${g.caption ? `<br><em style="font-size:12px;color:var(--text-muted);">"${g.caption}"</em>` : ''}`;
+      document.getElementById('del-photo-actions').innerHTML = `
+        <button class="btn btn-secondary" style="flex:1" onclick="denyDeleteRequest('${snap.key}')">Rechazar</button>
+        <button class="btn btn-primary" style="flex:1;background:#E87979;" onclick="approveDeleteRequest('${snap.key}','${req.photoId}')">Aprobar 🗑️</button>
+      `;
+      openModal('m-delete-photo');
+    }, 500);
+  });
+}
+
+function approveDeleteRequest(reqKey, photoId) {
+  S.gallery = S.gallery.filter(x=>x.id!==photoId);
+  saveLocal(); renderGallery();
+  coupleRef('deleteRequests/' + reqKey).remove();
+  closeModal('m-delete-photo');
+  showToast('✅ Recuerdo eliminado');
+}
+
+function denyDeleteRequest(reqKey) {
+  coupleRef('deleteRequests/' + reqKey).remove();
+  closeModal('m-delete-photo');
+  showToast('❌ Solicitud rechazada');
 }
 
 // ═══════════════════════ GIFTS ═══════════════════════
@@ -1943,7 +2152,7 @@ function renderGifts() {
   } else {
     wl.innerHTML = S.wishes.map(w => `
       <div class="wish-row">
-        <span style="font-size:20px;">${w.done?'🎁':'⭐'}</span>
+        <span style="font-size:20px;">${w.done ? '🎁' : (w.icon||'⭐')}</span>
         <span style="flex:1;font-size:14px;${w.done?'text-decoration:line-through;color:var(--text-muted)':''}">${w.text}</span>
         <button class="btn btn-ghost" style="font-size:12px;padding:4px 7px;" onclick="toggleWish('${w.id}')">${w.done?'↩️':'✓'}</button>
         <button class="btn btn-ghost" style="font-size:12px;padding:4px;" onclick="delWish('${w.id}')">🗑️</button>
@@ -1968,12 +2177,18 @@ function renderGifts() {
   `).join('');
 }
 
-function addWish() {
-  const v = prompt('¿Qué querés que te regalen? 🎁');
-  if (!v?.trim()) return;
-  S.wishes.push({ id: uid(), text: v.trim(), done: false });
+function addWish() { openModal('m-add-wish'); }
+
+function saveWish() {
+  const v = document.getElementById('wish-inp').value.trim();
+  if (!v) { showToast('⚠️ Escribí tu deseo primero'); return; }
+  const cat = document.getElementById('wish-cat').value;
+  const icons = { regalo:'🎁', experiencia:'✨', viaje:'✈️', comida:'🍕', otro:'💬' };
+  S.wishes.push({ id: uid(), text: v, cat, icon: icons[cat]||'⭐', done: false });
   save(); renderGifts();
-  showToast('⭐ Agregado a tu lista');
+  closeModal('m-add-wish');
+  document.getElementById('wish-inp').value = '';
+  showToast('⭐ Deseo agregado a la lista');
 }
 function toggleWish(id) { const w=S.wishes.find(x=>x.id===id); if(w){w.done=!w.done;save();renderGifts();} }
 function delWish(id) { S.wishes=S.wishes.filter(x=>x.id!==id); save(); renderGifts(); }
@@ -2012,7 +2227,30 @@ function showToast(msg) {
   clearTimeout(tt); tt = setTimeout(() => el.classList.remove('on'), 2800);
 }
 
-// ═══════════════════════ UTILS ═══════════════════════
+// ═══════════════════════ THEME ═══════════════════════
+function applyTheme(light) {
+  document.body.classList.toggle('light-mode', light);
+  const lbl = document.getElementById('theme-toggle-lbl');
+  const desc = document.getElementById('theme-toggle-desc');
+  const tog = document.getElementById('tog-theme');
+  if (lbl) lbl.textContent = light ? '☀️ Modo claro' : '🌙 Modo oscuro';
+  if (desc) desc.textContent = light ? 'Fondo blanco, más luminoso' : 'Fondo oscuro, más romántico';
+  if (tog) tog.classList.toggle('on', !light); // toggle "on" = dark mode on
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.contains('light-mode');
+  const newLight = !isLight;
+  localStorage.setItem('contigo_theme', newLight ? 'light' : 'dark');
+  applyTheme(newLight);
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem('contigo_theme');
+  applyTheme(saved === 'light');
+}
+
+// ══════════════════ UTILS ══════════════════
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
 // ═══════════════════════ INIT ═══════════════════════
@@ -2193,6 +2431,7 @@ checkScheduled();
 
 // ══════════════════ INIT ══════════════════
 loadLocal();
+loadTheme();
 qIdx = Math.floor(Math.random() * QUOTES.length);
 document.getElementById('daily-quote').textContent = QUOTES[qIdx];
 
