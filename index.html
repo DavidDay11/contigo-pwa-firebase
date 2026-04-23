@@ -872,13 +872,7 @@
     <div class="ig"><label class="label">Próximo encuentro</label><input class="field" type="date" id="cfg-date-next"></div>
     <div class="ig"><label class="label">Tu zona horaria</label><select class="field" id="cfg-tz-me"></select></div>
     <div class="ig"><label class="label">Zona horaria de tu pareja</label><select class="field" id="cfg-tz-them"></select></div>
-  <div class="ig"><label class="label" id="lbl-lang">Idioma / Language</label>
-  <select class="field" id="cfg-lang" onchange="setLang(this.value)">
-    <option value="es">🇦🇷 Español</option>
-    <option value="en">🇺🇸 English</option>
-  </select>
-</div>
-<div class="divider"></div>
+    <div class="divider"></div>
     <div class="trow"><div class="trow-info"><div class="tl">Notificaciones</div><div class="td">Recordatorios y alertas</div></div><div class="toggle on" id="tog-notif" onclick="this.classList.toggle('on')"></div></div>
     <div class="trow" style="border:none;"><div class="trow-info"><div class="tl" id="theme-toggle-lbl">🌙 Modo oscuro</div><div class="td" id="theme-toggle-desc">Fondo oscuro, más romántico</div></div><div class="toggle on" id="tog-theme" onclick="toggleTheme()"></div></div>
     <div class="divider"></div>
@@ -886,13 +880,6 @@
       <button class="btn btn-secondary" style="flex:1" onclick="closeModal('m-settings')">Cancelar</button>
       <button class="btn btn-primary" style="flex:1" onclick="saveSettings()">Guardar</button>
     </div>
-    <div style="text-align:center;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
-      <span style="font-size:11.5px;color:var(--text-dim);font-weight:600;letter-spacing:.04em;">
-        Hecho con 💕 por <span style="color:var(--accent);">ModSystems</span>
-      </span>
-    </div>
-  </div>
-</div>
   </div>
 </div>
 
@@ -1095,75 +1082,219 @@
 </div>
 
 <script>
-  // ═══════════════════════ I18N ═══════════════════════
+// ═══════════════════════ I18N ═══════════════════════
 const LANGS = {
   es: {
-    appTagline: 'Cerca aunque estén lejos',
-    loginBtn: 'Entrar con Google',
-    loginSub: 'Tus datos se sincronizan en tiempo real entre vos y tu pareja 💕',
+    appTagline:'Cerca aunque estén lejos', loginBtn:'Entrar con Google',
+    loginSub:'Tus datos se sincronizan en tiempo real entre vos y tu pareja 💕',
     navHome:'Inicio', navWatch:'Ver', navGames:'Jugar', navLove:'Amor', navGallery:'Fotos', navGifts:'Regalos',
-    touchBtn: '💓 Mandar un latido',
-    touchSent: '💓 Latido enviado',
-    daysTogetherLbl: 'Días juntos 💑',
-    daysNextLbl: 'Para verte 🗓️',
-    settingsTitle: '⚙️ Configuración',
-    langLabel: 'Idioma',
-    themeDark: '🌙 Modo oscuro', themeLight: '☀️ Modo claro',
-    themeDarkDesc: 'Fondo oscuro, más romántico', themeLightDesc: 'Fondo blanco, más luminoso',
-    madeBy: 'Hecho con 💕 por',
+    touchBtn:'💓 Mandar un latido', touchSent:'💓 ¡Latido enviado!',
+    touchReceived:'💓 ¡{name} te mandó un latido!',
+    daysTogetherLbl:'Días juntos 💑', daysNextLbl:'Para verte 🗓️',
+    clockMyZone:'Mi zona', clockTheirZone:'Su zona',
+    moodToday:'Hoy te sentís:', moodLabel:'🌙 ¿Cómo estás hoy?',
+    quoteTitle:'✨ Frase del día', quoteBtn:'🔄 Otra frase',
+    settingsTitle:'⚙️ Configuración', settingsSave:'Guardar', settingsCancel:'Cancelar',
+    myName:'Tu nombre', theirName:'Nombre de tu pareja',
+    togetherSince:'Juntos desde', nextMeeting:'Próximo encuentro',
+    myTimezone:'Tu zona horaria', theirTimezone:'Zona horaria de tu pareja',
+    notifications:'Notificaciones', notificationsDesc:'Recordatorios y alertas',
+    themeDark:'🌙 Modo oscuro', themeLight:'☀️ Modo claro',
+    themeDarkDesc:'Fondo oscuro, más romántico', themeLightDesc:'Fondo blanco, más luminoso',
+    langLabel:'Idioma / Language',
+    madeBy:'Hecho con 💕 por',
+    onboardHello:'¡Hola, {name}!', onboardSub:'¿Querés crear una sala nueva o unirte con el código de tu pareja?',
+    createRoom:'Crear sala nueva', joinRoom:'Unirme con código',
+    createRoomConfirm:'Se genera un código para que tu pareja se una. ¿Confirmás?',
+    createRoomBtn:'Crear sala', creating:'Creando tu sala',
+    roomCreated:'¡Sala creada!', shareCode:'Compartí este código con tu pareja:',
+    tapCopy:'Tocá para copiar', partnerInstructions:'Tu pareja abre la app, inicia sesión y elige "Unirme con código"',
+    enterApp:'Entrar a mi sala', cancelRoom:'Cancelar y volver',
+    codeCopied:'Código copiado', yourCode:'Tu código',
+    joinRoomSub:'Ingresá el código de 6 letras que te compartió tu pareja:',
+    joinBtn:'Unirme', back:'Volver',
+    codeNotFound:'Código no encontrado', codeNotFoundSub:'Verificá el código e intentá de nuevo.',
+    tryAgain:'Intentar de nuevo', linkedTitle:'¡Vinculadxs!',
+    linkedSub:'Ya están conectados. ¡Todo listo para estar juntos aunque estén lejos! 💕',
+    watchTitle:'📺 Ver juntos', watchSub:'Su lista compartida de series, pelis y animes',
+    filterAll:'Todo', filterSeen:'✅ Visto',
+    addTitle:'+ Agregar título', addBtn:'Agregar',
+    titleField:'Título', typeField:'Tipo', whoField:'Propuesto por', noteField:'Nota (opcional)',
+    me:'Yo', myPartner:'Mi pareja',
+    seen:'✅ Visto', pending:'👁️ Pendiente', markSeen:'Marcar visto', markPending:'Pendiente',
+    gamesTitle:'🎮 Juguemos', gamesSub:'Actividades para sentirse cerca aunque estén lejos',
+    inApp:'Dentro de la app', inCall:'En llamada / vida real',
+    loveTitle:'💌 Mensajes', loveSub:'Palabras que abrazan desde lejos',
+    newNote:'📝 Nueva nota de amor', notePlaceholder:'Escribí algo desde el corazón...',
+    schedule:'⏰ Programar', sendLove:'Enviar 💕', reminders:'🔔 Recordatorios',
+    addReminder:'+ Agregar recordatorio', sentNotes:'💌 Notas enviadas',
+    galleryTitle:'📸 Recuerdos', gallerySub:'El álbum de todo lo que les hace felices',
+    memories:'recuerdos', ourHistory:'✨ Nuestra historia',
+    giftsTitle:'🎁 Detalles', giftsSub:'Porque la distancia no frena los gestos de amor',
+    wishlist:'🌟 Lista de deseos', addWishBtn:'+ Agregar deseo',
+    paymentMethods:'💳 Métodos de pago / envío', addPayment:'+ Agregar método',
+    coupleCode:'Tu código de pareja', tapToCopy:'Tocá para copiar y compartir con tu pareja',
+    partnerLinked:'Pareja vinculada', notLinked:'Sin vincular aún',
+    linked:'Vinculadx ✅', logout:'Cerrar sesión', close:'Cerrar',
+    noCode:'Sin código aún',
+    onlineStatus:'{name} está online', offlineStatus:'{name} está offline',
+    synced:'Sincronizado', saving:'Guardando…', offline:'Sin conexión',
+    installBanner:'Instalá Contigo en tu celu', install:'Instalar',
+    updateAvailable:'🔄 Actualización disponible — recargá la app',
+    connectionRestored:'✅ Conexión restaurada', connectionLost:'📵 Sin conexión — todo guardado localmente',
+    reminderAdded:'🔔 Recordatorio agregado', noteSent:'💌 Nota enviada con amor 💕',
+    photoSaved:'📸 Recuerdo guardado 💕', photoDeleted:'🗑️ Recuerdo eliminado',
+    requestSent:'📩 Solicitud enviada a {name}', requestDenied:'❌ Solicitud rechazada',
+    requestApproved:'✅ Recuerdo eliminado', requestIncoming:'📩 {name} pide eliminar una foto',
+    wishAdded:'⭐ Deseo agregado a la lista', paymentSaved:'💳 Método guardado',
+    aliasCopied:'📋 Alias copiado al portapapeles',
+    leaveRoomTitle:'Abandonar sala', leaveRoomMsg:'¿Seguro que querés abandonar tu sala actual e unirte a otra? No podrás recuperar tus datos sincronizados.',
+    leaveRoomBtn:'Abandonar y unirme a otra', stayBtn:'Quedarme en mi sala',
+    abandonRequested:'⚠️ Sala abandonada',
   },
   en: {
-    appTagline: 'Close even when apart',
-    loginBtn: 'Sign in with Google',
-    loginSub: 'Your data syncs in real time between you and your partner 💕',
+    appTagline:'Close even when apart', loginBtn:'Sign in with Google',
+    loginSub:'Your data syncs in real time between you and your partner 💕',
     navHome:'Home', navWatch:'Watch', navGames:'Play', navLove:'Love', navGallery:'Photos', navGifts:'Gifts',
-    touchBtn: '💓 Send a heartbeat',
-    touchSent: '💓 Heartbeat sent',
-    daysTogetherLbl: 'Days together 💑',
-    daysNextLbl: 'Until we meet 🗓️',
-    settingsTitle: '⚙️ Settings',
-    langLabel: 'Language',
-    themeDark: '🌙 Dark mode', themeLight: '☀️ Light mode',
-    themeDarkDesc: 'Dark background, more romantic', themeLightDesc: 'White background, brighter',
-    madeBy: 'Made with 💕 by',
+    touchBtn:'💓 Send a heartbeat', touchSent:'💓 Heartbeat sent!',
+    touchReceived:'💓 {name} sent you a heartbeat!',
+    daysTogetherLbl:'Days together 💑', daysNextLbl:'Until we meet 🗓️',
+    clockMyZone:'My zone', clockTheirZone:'Their zone',
+    moodToday:'Today you feel:', moodLabel:'🌙 How are you today?',
+    quoteTitle:'✨ Quote of the day', quoteBtn:'🔄 Another quote',
+    settingsTitle:'⚙️ Settings', settingsSave:'Save', settingsCancel:'Cancel',
+    myName:'Your name', theirName:"Partner's name",
+    togetherSince:'Together since', nextMeeting:'Next meeting',
+    myTimezone:'Your timezone', theirTimezone:"Partner's timezone",
+    notifications:'Notifications', notificationsDesc:'Reminders and alerts',
+    themeDark:'🌙 Dark mode', themeLight:'☀️ Light mode',
+    themeDarkDesc:'Dark background, more romantic', themeLightDesc:'White background, brighter',
+    langLabel:'Idioma / Language',
+    madeBy:'Made with 💕 by',
+    onboardHello:'Hello, {name}!', onboardSub:'Create a new room or join with your partner\'s code?',
+    createRoom:'Create new room', joinRoom:'Join with code',
+    createRoomConfirm:'A code will be generated for your partner to join. Confirm?',
+    createRoomBtn:'Create room', creating:'Creating your room',
+    roomCreated:'Room created!', shareCode:'Share this code with your partner:',
+    tapCopy:'Tap to copy', partnerInstructions:'Your partner opens the app, signs in and chooses "Join with code"',
+    enterApp:'Enter my room', cancelRoom:'Cancel and go back',
+    codeCopied:'Code copied', yourCode:'Your code',
+    joinRoomSub:'Enter the 6-character code your partner shared with you:',
+    joinBtn:'Join', back:'Back',
+    codeNotFound:'Code not found', codeNotFoundSub:'Check the code and try again.',
+    tryAgain:'Try again', linkedTitle:'Connected!',
+    linkedSub:'You\'re now linked. Ready to be together even when apart! 💕',
+    watchTitle:'📺 Watch together', watchSub:'Your shared list of shows, movies and anime',
+    filterAll:'All', filterSeen:'✅ Watched',
+    addTitle:'+ Add title', addBtn:'Add',
+    titleField:'Title', typeField:'Type', whoField:'Suggested by', noteField:'Note (optional)',
+    me:'Me', myPartner:'My partner',
+    seen:'✅ Watched', pending:'👁️ Pending', markSeen:'Mark watched', markPending:'Mark pending',
+    gamesTitle:'🎮 Let\'s play', gamesSub:'Activities to feel close even when far apart',
+    inApp:'In the app', inCall:'On call / real life',
+    loveTitle:'💌 Messages', loveSub:'Words that hug from afar',
+    newNote:'📝 New love note', notePlaceholder:'Write something from the heart...',
+    schedule:'⏰ Schedule', sendLove:'Send 💕', reminders:'🔔 Reminders',
+    addReminder:'+ Add reminder', sentNotes:'💌 Sent notes',
+    galleryTitle:'📸 Memories', gallerySub:'The album of everything that makes you happy',
+    memories:'memories', ourHistory:'✨ Our story',
+    giftsTitle:'🎁 Gifts', giftsSub:'Because distance doesn\'t stop gestures of love',
+    wishlist:'🌟 Wish list', addWishBtn:'+ Add wish',
+    paymentMethods:'💳 Payment / shipping methods', addPayment:'+ Add method',
+    coupleCode:'Your couple code', tapToCopy:'Tap to copy and share with your partner',
+    partnerLinked:'Partner linked', notLinked:'Not linked yet',
+    linked:'Linked ✅', logout:'Sign out', close:'Close',
+    noCode:'No code yet',
+    onlineStatus:'{name} is online', offlineStatus:'{name} is offline',
+    synced:'Synced', saving:'Saving…', offline:'Offline',
+    installBanner:'Install Contigo on your phone', install:'Install',
+    updateAvailable:'🔄 Update available — reload the app',
+    connectionRestored:'✅ Connection restored', connectionLost:'📵 Offline — all saved locally',
+    reminderAdded:'🔔 Reminder added', noteSent:'💌 Note sent with love 💕',
+    photoSaved:'📸 Memory saved 💕', photoDeleted:'🗑️ Memory deleted',
+    requestSent:'📩 Request sent to {name}', requestDenied:'❌ Request denied',
+    requestApproved:'✅ Memory deleted', requestIncoming:'📩 {name} wants to delete a photo',
+    wishAdded:'⭐ Wish added to list', paymentSaved:'💳 Method saved',
+    aliasCopied:'📋 Alias copied to clipboard',
+    leaveRoomTitle:'Leave room', leaveRoomMsg:'Are you sure you want to leave your current room and join another? Your synced data cannot be recovered.',
+    leaveRoomBtn:'Leave and join another', stayBtn:'Stay in my room',
+    abandonRequested:'⚠️ Room abandoned',
   },
 };
 
 let currentLang = 'es';
-function t(key) { return LANGS[currentLang]?.[key] || LANGS.es[key] || key; }
-
+function t(key, vars) {
+  let s = LANGS[currentLang]?.[key] ?? LANGS.es[key] ?? key;
+  if (vars) Object.keys(vars).forEach(k => { s = s.replace('{'+k+'}', vars[k]); });
+  return s;
+}
 function detectLang() {
   const saved = localStorage.getItem('contigo_lang');
   if (saved && LANGS[saved]) return saved;
-  const nav = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+  const nav = (navigator.language || 'es').toLowerCase();
   return nav.startsWith('en') ? 'en' : 'es';
 }
-
 function setLang(lang) {
   if (!LANGS[lang]) return;
   currentLang = lang;
   localStorage.setItem('contigo_lang', lang);
   applyLangToDOM();
 }
+function loadLang() { currentLang = detectLang(); applyLangToDOM(); }
 
 function applyLangToDOM() {
-  // Auth screen
-  const loginBtn = document.querySelector('.btn-google');
-  if (loginBtn) loginBtn.childNodes[1] && (loginBtn.childNodes[loginBtn.childNodes.length-1].textContent = ' ' + t('loginBtn'));
+  // Auth
   const tagline = document.querySelector('.auth-tagline');
   if (tagline) tagline.textContent = t('appTagline');
-  // Nav labels
-  const navLabels = document.querySelectorAll('.nl');
-  const keys = ['navHome','navWatch','navGames','navLove','navGallery','navGifts'];
-  navLabels.forEach((el,i) => { if(keys[i]) el.textContent = t(keys[i]); });
-  // Touch button
+  const loginBtn = document.querySelector('.btn-google');
+  if (loginBtn) { const last = loginBtn.lastChild; if(last) last.textContent = ' '+t('loginBtn'); }
+  // Nav
+  const navKeys = ['navHome','navWatch','navGames','navLove','navGallery','navGifts'];
+  document.querySelectorAll('.nl').forEach((el,i) => { if(navKeys[i]) el.textContent = t(navKeys[i]); });
+  // Touch btn
   const tb = document.getElementById('touch-btn');
   if (tb && !tb.innerHTML.includes('💓💓')) tb.innerHTML = t('touchBtn');
-  // Day labels
-  const dt = document.querySelector('.stat-lbl');
-  if (dt) dt.textContent = t('daysTogetherLbl');
+  // Section headers
+  const sh = { 'watch':['watchTitle','watchSub'], 'games':['gamesTitle','gamesSub'], 'love':['loveTitle','loveSub'], 'gallery':['galleryTitle','gallerySub'], 'gifts':['giftsTitle','giftsSub'] };
+  Object.entries(sh).forEach(([sec,[tk,sk]]) => {
+    const el = document.querySelector(`#s-${sec} .sec-head`);
+    if (el) { const h=el.querySelector('h2'); const p=el.querySelector('p'); if(h)h.textContent=t(tk); if(p)p.textContent=t(sk); }
+  });
+  // Home card titles & labels
+  _setTxt('.stat-lbl:first-of-type', t('daysTogetherLbl'));
+  _setTxt('#clock-me-lbl', t('clockMyZone'));
+  _setTxt('.card-title', t('moodLabel'), 2); // 3rd card title
+  // Settings modal labels
+  _setLbl('cfg-me', t('myName')); _setLbl('cfg-them', t('theirName'));
+  _setLbl('cfg-date-start', t('togetherSince')); _setLbl('cfg-date-next', t('nextMeeting'));
+  _setLbl('cfg-tz-me', t('myTimezone')); _setLbl('cfg-tz-them', t('theirTimezone'));
+  _setLbl('cfg-lang', t('langLabel'));
+  const ttl = document.getElementById('theme-toggle-lbl');
+  if (ttl) ttl.textContent = document.body.classList.contains('light-mode') ? t('themeLight') : t('themeDark');
+  const tdesc = document.getElementById('theme-toggle-desc');
+  if (tdesc) tdesc.textContent = document.body.classList.contains('light-mode') ? t('themeLightDesc') : t('themeDarkDesc');
+  // User menu
+  _setTxt('#m-user-menu .card > div:first-child', t('coupleCode'));
+  _setTxt('#m-user-menu .card > div:last-child', t('tapToCopy'));
+  // Sync status
+  setSyncStatus(document.getElementById('sync-dot')?.className.includes('online') ? 'online' : document.getElementById('sync-dot')?.className.includes('syncing') ? 'syncing' : 'offline');
+  // Lang selector
+  const ls = document.getElementById('cfg-lang');
+  if (ls) ls.value = currentLang;
 }
-// ═══════════════════════ FIREBASE INIT ═══════════════════════
+
+function _setTxt(sel, val, idx) {
+  const els = document.querySelectorAll(sel);
+  const el = els[idx ?? 0];
+  if (el) el.textContent = val;
+}
+function _setLbl(fieldId, val) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  const lbl = field.closest('.ig')?.querySelector('.label');
+  if (lbl) lbl.textContent = val;
+}
+
 // FB_CONFIG viene de config.js
 let fbApp, fbAuth, fbDb;
 try {
@@ -1421,68 +1552,58 @@ function showOnboarding() {
   const card = document.getElementById('onboard-card');
   screen.classList.remove('hidden');
   document.getElementById('app').style.display = 'none';
-
+  const name = (currentUser.displayName||'').split(' ')[0] || 'bienvenidx';
   card.innerHTML = `
     <div style="font-size:52px;margin-bottom:12px;">💑</div>
-    <div class="onboard-title">¡Hola, ${(currentUser.displayName||'').split(' ')[0] || 'bienvenidx'}!</div>
-    <p class="onboard-sub">¿Querés crear una sala nueva para tu pareja, o unirte a una existente con el código que te pasaron?</p>
-    <button class="btn btn-primary btn-full" onclick="createRoom()" style="margin-bottom:10px;">💕 Crear sala nueva</button>
-    <button class="btn btn-secondary btn-full" onclick="showJoinRoom()">🔑 Unirme con código</button>
+    <div class="onboard-title">${t('onboardHello').replace('{name}', name)}</div>
+    <p class="onboard-sub">${t('onboardSub')}</p>
+    <button class="btn btn-primary btn-full" onclick="createRoom()" style="margin-bottom:10px;">💕 ${t('createRoom')}</button>
+    <button class="btn btn-secondary btn-full" onclick="showJoinRoom()">🔑 ${t('joinRoom')}</button>
   `;
 }
 
 async function createRoom() {
   const card = document.getElementById('onboard-card');
-  // Confirmación antes de crear
   card.innerHTML = `
     <div style="font-size:42px;margin-bottom:10px;">💕</div>
-    <div class="onboard-title">Crear sala nueva</div>
-    <p class="onboard-sub">Se generará un código para que tu pareja se una. ¿Confirmás?</p>
-    <button class="btn btn-primary btn-full" onclick="_doCreateRoom()" style="margin-bottom:8px;">Crear sala →</button>
-    <button class="btn btn-ghost btn-full" onclick="showOnboarding()">← Volver</button>
+    <div class="onboard-title">${t('createRoom')}</div>
+    <p class="onboard-sub">${t('createRoomConfirm')}</p>
+    <button class="btn btn-primary btn-full" onclick="_doCreateRoom()" style="margin-bottom:8px;">${t('createRoomBtn')} →</button>
+    <button class="btn btn-ghost btn-full" onclick="showOnboarding()">← ${t('back')}</button>
   `;
 }
 
 async function _doCreateRoom() {
   const card = document.getElementById('onboard-card');
-  card.innerHTML = `<div style="font-size:32px;margin-bottom:12px;animation:hb 1.2s infinite;">💕</div><p style="color:var(--text-muted);">Creando tu sala…</p>`;
-
+  card.innerHTML = `<div style="font-size:32px;margin-bottom:12px;animation:hb 1.2s infinite;">💕</div><p style="color:var(--text-muted);">${t('creating')}…</p>`;
   const newCoupleId = uid();
   const code = Math.random().toString(36).substr(2,6).toUpperCase();
   inviteCode = code;
   coupleId = newCoupleId;
-
   await fbDb.ref(`userCouples/${currentUser.uid}`).set(newCoupleId);
   await fbDb.ref(`userInvites/${currentUser.uid}`).set(code);
   await fbDb.ref(`couples/${newCoupleId}/members/${currentUser.uid}`).set({
-    name: currentUser.displayName || S.cfg.me,
-    photoURL: currentUser.photoURL || '',
-    joinedAt: Date.now(),
+    name: currentUser.displayName || S.cfg.me, photoURL: currentUser.photoURL || '', joinedAt: Date.now(),
   });
-  await fbDb.ref(`invites/${code}`).set({
-    coupleId: newCoupleId,
-    createdBy: currentUser.uid,
-    createdAt: Date.now(),
-  });
-
+  await fbDb.ref(`invites/${code}`).set({ coupleId: newCoupleId, createdBy: currentUser.uid, createdAt: Date.now() });
   card.innerHTML = `
     <div style="font-size:36px;margin-bottom:10px;">🎉</div>
-    <div class="onboard-title">¡Sala creada!</div>
-    <p class="onboard-sub">Compartí este código con tu pareja para que se una:</p>
+    <div class="onboard-title">${t('roomCreated')}</div>
+    <p class="onboard-sub">${t('shareCode')}</p>
     <div class="invite-code-display" onclick="copyOnboardCode()">
       <div class="invite-code-val" id="ob-code">${code}</div>
-      <div class="invite-code-hint">Tocá para copiar 📋</div>
+      <div class="invite-code-hint">${t('tapCopy')} 📋</div>
     </div>
-    <p style="font-size:12px;color:var(--text-dim);margin-bottom:18px;line-height:1.5;">Tu pareja abre la app, inicia sesión con Google y elige "Unirme con código"</p>
-    <button class="btn btn-primary btn-full" onclick="enterAfterCreate()">Entrar a mi sala →</button>
-    <button class="btn btn-ghost btn-full" style="margin-top:6px;font-size:12px;" onclick="cancelCreatedRoom()">← Cancelar y volver</button>
+    <p style="font-size:12px;color:var(--text-dim);margin-bottom:18px;line-height:1.5;">${t('partnerInstructions')}</p>
+    <button class="btn btn-primary btn-full" onclick="enterAfterCreate()">${t('enterApp')} →</button>
+    <button class="btn btn-ghost btn-full" style="margin-top:8px;" onclick="abandonRoomAndBack()">← ${t('cancelRoom')}</button>
   `;
   window.copyOnboardCode = () => {
-    navigator.clipboard?.writeText(code).then(()=>showToast('📋 Código copiado: '+code)).catch(()=>showToast('Código: '+code));
+    navigator.clipboard?.writeText(code).then(()=>showToast('📋 '+t('codeCopied')+': '+code)).catch(()=>showToast(t('yourCode')+': '+code));
   };
 }
 
-async function cancelCreatedRoom() {
+async function abandonRoomAndBack() {
   if (coupleId) {
     await fbDb.ref(`userCouples/${currentUser.uid}`).remove();
     await fbDb.ref(`userInvites/${currentUser.uid}`).remove();
@@ -1493,20 +1614,18 @@ async function cancelCreatedRoom() {
   showOnboarding();
 }
 
-function enterAfterCreate() {
-  loadFromFirebase().then(() => enterApp());
-}
+function enterAfterCreate() { loadFromFirebase().then(() => enterApp()); }
 
 function showJoinRoom() {
   const card = document.getElementById('onboard-card');
   card.innerHTML = `
     <div style="font-size:42px;margin-bottom:10px;">🔑</div>
-    <div class="onboard-title">Unirme a una sala</div>
-    <p class="onboard-sub">Ingresá el código de 6 letras que te compartió tu pareja:</p>
+    <div class="onboard-title">${t('joinRoom')}</div>
+    <p class="onboard-sub">${t('joinRoomSub')}</p>
     <input class="field" id="join-code-inp" placeholder="XXXXXX" maxlength="6"
       style="text-align:center;font-size:28px;font-family:var(--font-display);letter-spacing:.2em;margin-bottom:14px;text-transform:uppercase;">
-    <button class="btn btn-primary btn-full" onclick="joinRoom()" style="margin-bottom:8px;">Unirme 💕</button>
-    <button class="btn btn-ghost btn-full" onclick="showOnboarding()">← Volver</button>
+    <button class="btn btn-primary btn-full" onclick="joinRoom()" style="margin-bottom:8px;">${t('joinBtn')} 💕</button>
+    <button class="btn btn-ghost btn-full" onclick="showOnboarding()">← ${t('back')}</button>
   `;
   setTimeout(() => document.getElementById('join-code-inp')?.focus(), 100);
 }
@@ -1567,13 +1686,10 @@ async function enterApp() {
     const snap = await fbDb.ref(`couples/${coupleId}/members`).get();
     const members = snap.val() || {};
     // Buscar código en invites (solo creator lo tiene; partner simplemente ya está)
-const codeSnap = await fbDb.ref(`userInvites/${currentUser.uid}`).get();
-  if (codeSnap.exists()) {
-    inviteCode = codeSnap.val();
-  } else {
     const invSnap = await fbDb.ref('invites').orderByChild('coupleId').equalTo(coupleId).get();
-    if (invSnap.exists()) inviteCode = Object.keys(invSnap.val())[0];
-  }
+    if (invSnap.exists()) {
+      inviteCode = Object.keys(invSnap.val())[0];
+    }
     // Detectar partner uid
     const uids = Object.keys(members);
     partnerUid = uids.find(u => u !== currentUser.uid) || null;
@@ -1637,8 +1753,6 @@ let qIdx = 0;
 function nextQuote() { qIdx = (qIdx + 1) % QUOTES.length; document.getElementById('daily-quote').textContent = QUOTES[qIdx]; }
 
 function renderHome() {
-  const qEl = document.getElementById('daily-quote');
-  if (!qEl.textContent.trim()) qEl.textContent = QUOTES[qIdx];
   document.getElementById('couple-names').innerHTML = `${S.cfg.me} &amp; ${S.cfg.them}`;
   document.getElementById('av-me').textContent = S.avMe;
   document.getElementById('av-them').textContent = S.avThem;
@@ -1715,7 +1829,6 @@ function openSettings() {
   document.getElementById('cfg-date-start').value = S.cfg.start;
   document.getElementById('cfg-date-next').value = S.cfg.next;
   openModal('m-settings');
-  document.getElementById('cfg-lang').value = currentLang;
 }
 
 function saveSettings() {
@@ -2357,17 +2470,12 @@ function loadTheme() {
   const saved = localStorage.getItem('contigo_theme');
   applyTheme(saved === 'light');
 }
-function loadLang() {
-  currentLang = detectLang();
-  applyLangToDOM();
-}
 
 // ══════════════════ UTILS ══════════════════
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
 // ═══════════════════════ INIT ═══════════════════════
 load();
-
 qIdx = Math.floor(Math.random() * QUOTES.length);
 document.getElementById('daily-quote').textContent = QUOTES[qIdx];
 renderHome();
@@ -2545,7 +2653,6 @@ checkScheduled();
 // ══════════════════ INIT ══════════════════
 loadLocal();
 loadTheme();
-loadLang();
 qIdx = Math.floor(Math.random() * QUOTES.length);
 document.getElementById('daily-quote').textContent = QUOTES[qIdx];
 
