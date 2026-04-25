@@ -1115,44 +1115,140 @@
   // ═══════════════════════ I18N ═══════════════════════
 const LANGS = {
   es: {
-    appTagline: 'Cerca aunque estén lejos',
-    loginBtn: 'Entrar con Google',
-    loginSub: 'Tus datos se sincronizan en tiempo real entre vos y tu pareja 💕',
+    appTagline:'Cerca aunque estén lejos', loginBtn:'Entrar con Google',
     navHome:'Inicio', navWatch:'Ver', navGames:'Jugar', navLove:'Amor', navGallery:'Fotos', navGifts:'Regalos',
-    touchBtn: '💓 Mandar un latido',
-    touchSent: '💓 Latido enviado',
-    daysTogetherLbl: 'Días juntos 💑',
-    daysNextLbl: 'Para verte 🗓️',
-    settingsTitle: '⚙️ Configuración',
-    langLabel: 'Idioma',
-    themeDark: '🌙 Modo oscuro', themeLight: '☀️ Modo claro',
-    themeDarkDesc: 'Fondo oscuro, más romántico', themeLightDesc: 'Fondo blanco, más luminoso',
-    madeBy: 'Hecho con 💕 por',
+    touchBtn:'💓 Mandar un latido', daysTogetherLbl:'Días juntos 💑', daysNextLbl:'Para verte 🗓️',
+    clockMyZone:'Mi zona', clockTheirZone:'Su zona',
+    moodTitle:'🌙 ¿Cómo estás hoy?', quoteTitle:'✨ Frase del día', quoteBtn:'🔄 Otra frase',
+    clocksTitle:'⏰ Nuestros relojes',
+    watchTitle:'📺 Ver juntos', watchSub:'Su lista compartida de series, pelis y animes',
+    filterAll:'Todo', filterSeen:'✅ Visto', addWatchBtn:'+ Agregar título',
+    typeSerie:'📺 Serie', typePelicula:'🎬 Película', typeAnime:'⛩️ Anime', typeDocu:'📽️ Documental',
+    whoMe:'Yo', whoThem:'Mi pareja', noteField:'Nota (opcional)', addBtn:'Agregar', cancelBtn:'Cancelar',
+    markSeen:'Marcar visto', markPending:'Pendiente', deleteBtn:'🗑️',
+    gamesTitle:'🎮 Juguemos', gamesSub:'Actividades para sentirse cerca aunque estén lejos',
+    inApp:'Dentro de la app', inCall:'En llamada / vida real',
+    g1n:'Preguntas íntimas', g1d:'Conócense con preguntas profundas',
+    g2n:'¿Preferirías?', g2d:'Dilemas divertidos y reveladores',
+    g3n:'Verdad o Dato', g3d:'La versión íntima para parejas',
+    g4n:'Ruleta de amor', g4d:'Actividades sorpresa para hacer juntos',
+    g5n:'Retos en pareja', g5d:'Desafíos para hacer juntos por video',
+    g6n:'Trivia de pareja', g6d:'¿Cuánto sabés del otro?',
+    g7n:'Adivina el dibujo', g7d:'Dibujá y que adivine por video',
+    g8n:'Bucket list', g8d:'Sueños y metas para cumplir juntos',
+    loveTitle:'💌 Mensajes', loveSub:'Palabras que abrazan desde lejos',
+    newNoteTitle:'📝 Nueva nota de amor', notePlaceholder:'Escribí algo desde el corazón...',
+    scheduleBtn:'⏰ Programar', sendBtn:'Enviar 💕',
+    remindersTitle:'🔔 Recordatorios', addReminderBtn:'+ Agregar recordatorio', sentNotesTitle:'💌 Notas enviadas',
+    galleryTitle:'📸 Recuerdos', gallerySub:'El álbum de todo lo que les hace felices',
+    memoriesCount:'recuerdos', ourStory:'✨ Nuestra historia', addPhotoBtn:'Agregar',
+    giftsTitle:'🎁 Detalles', giftsSub:'Porque la distancia no frena los gestos de amor',
+    wishlistTitle:'🌟 Lista de deseos', addWishBtn:'+ Agregar deseo',
+    payMethodsTitle:'💳 Métodos de pago / envío', addPaymentBtn:'+ Agregar método',
+    settingsTitle:'⚙️ Configuración', saveBtnLbl:'Guardar', cancelBtnLbl:'Cancelar',
+    myName:'Tu nombre', theirName:'Nombre de tu pareja',
+    togetherSince:'Juntos desde', nextMeeting:'Próximo encuentro',
+    myTz:'Tu zona horaria', theirTz:'Zona horaria de tu pareja',
+    notifLabel:'Notificaciones', notifDesc:'Recordatorios y alertas',
+    themeDark:'🌙 Modo oscuro', themeLight:'☀️ Modo claro',
+    themeDarkDesc:'Fondo oscuro, más romántico', themeLightDesc:'Fondo blanco, más luminoso',
+    langLabel:'Idioma / Language',
+    coupleCodeTitle:'Tu código de pareja', coupleCodeHint:'Tocá para copiar y compartir con tu pareja',
+    partnerLinkedLbl:'Pareja vinculada', notLinkedLbl:'Sin vincular aún',
+    linkedTag:'✅ Vinculadx', pendingTag:'Pendiente',
+    logoutBtn:'Cerrar sesión', closeBtn:'Cerrar', leaveRoomBtn:'🚪 Abandonar sala e unirme a otra',
+    leaveRoomTitle:'Abandonar sala',
+    leaveRoomMsg:'Vas a salir de tu sala actual. Tu pareja podrá seguir usándola. Después podrás unirte a otra con un código.',
+    stayBtn:'Quedarme', abandonBtn:'Abandonar',
+    onboardSub:'¿Querés crear una sala nueva para tu pareja, o unirte a una existente con el código que te pasaron?',
+    createRoomBtn:'💕 Crear sala nueva', joinRoomBtn:'🔑 Unirme con código',
+    createConfirm:'Se generará un código para que tu pareja se una. ¿Confirmás?',
+    createBtn:'Crear sala →', backBtn:'← Volver',
+    creating:'Creando tu sala', roomCreated:'¡Sala creada!',
+    shareCode:'Compartí este código con tu pareja:', tapCopy:'Tocá para copiar 📋',
+    partnerInstr:'Tu pareja abre la app, inicia sesión con Google y elige "Unirme con código"',
+    enterBtn:'Entrar a mi sala →', cancelRoomBtn:'← Cancelar y volver',
+    joinTitle:'Unirme a una sala', joinSub:'Ingresá el código de 6 letras que te compartió tu pareja:',
+    joinBtn:'Unirme 💕', joinError:'Código no encontrado', joinErrorSub:'Verificá el código e intentá de nuevo.',
+    tryAgain:'Intentar de nuevo', linkedTitle:'¡Vinculadxs!',
+    linkedSub:'Ya están conectados. ¡Todo listo para estar juntos aunque estén lejos! 💕',
+    enterAppBtn:'Entrar →',
+    madeBy:'Hecho con 💕 por',
+    synced:'Sincronizado', saving:'Guardando…', offlineLbl:'Sin conexión',
+    noCode:'Sin código aún',
   },
   en: {
-    appTagline: 'Close even when apart',
-    loginBtn: 'Sign in with Google',
-    loginSub: 'Your data syncs in real time between you and your partner 💕',
+    appTagline:'Close even when apart', loginBtn:'Sign in with Google',
     navHome:'Home', navWatch:'Watch', navGames:'Play', navLove:'Love', navGallery:'Photos', navGifts:'Gifts',
-    touchBtn: '💓 Send a heartbeat',
-    touchSent: '💓 Heartbeat sent',
-    daysTogetherLbl: 'Days together 💑',
-    daysNextLbl: 'Until we meet 🗓️',
-    settingsTitle: '⚙️ Settings',
-    langLabel: 'Language',
-    themeDark: '🌙 Dark mode', themeLight: '☀️ Light mode',
-    themeDarkDesc: 'Dark background, more romantic', themeLightDesc: 'White background, brighter',
-    madeBy: 'Made with 💕 by',
+    touchBtn:'💓 Send a heartbeat', daysTogetherLbl:'Days together 💑', daysNextLbl:'Until we meet 🗓️',
+    clockMyZone:'My zone', clockTheirZone:'Their zone',
+    moodTitle:'🌙 How are you today?', quoteTitle:'✨ Quote of the day', quoteBtn:'🔄 Another quote',
+    clocksTitle:'⏰ Our clocks',
+    watchTitle:'📺 Watch together', watchSub:'Your shared list of shows, movies and anime',
+    filterAll:'All', filterSeen:'✅ Watched', addWatchBtn:'+ Add title',
+    typeSerie:'📺 Show', typePelicula:'🎬 Movie', typeAnime:'⛩️ Anime', typeDocu:'📽️ Documentary',
+    whoMe:'Me', whoThem:'My partner', noteField:'Note (optional)', addBtn:'Add', cancelBtn:'Cancel',
+    markSeen:'Mark watched', markPending:'Mark pending', deleteBtn:'🗑️',
+    gamesTitle:'🎮 Let\'s play', gamesSub:'Activities to feel close even when far apart',
+    inApp:'In the app', inCall:'On call / real life',
+    g1n:'Intimate questions', g1d:'Get to know each other with deep questions',
+    g2n:'Would you rather?', g2d:'Fun and revealing dilemmas',
+    g3n:'Truth or Dare', g3d:'The intimate couples version',
+    g4n:'Love wheel', g4d:'Surprise activities to do together',
+    g5n:'Couple challenges', g5d:'Challenges to do together on video',
+    g6n:'Couple trivia', g6d:'How well do you know each other?',
+    g7n:'Guess the drawing', g7d:'Draw it and let them guess on video',
+    g8n:'Bucket list', g8d:'Dreams and goals to achieve together',
+    loveTitle:'💌 Messages', loveSub:'Words that hug from afar',
+    newNoteTitle:'📝 New love note', notePlaceholder:'Write something from the heart...',
+    scheduleBtn:'⏰ Schedule', sendBtn:'Send 💕',
+    remindersTitle:'🔔 Reminders', addReminderBtn:'+ Add reminder', sentNotesTitle:'💌 Sent notes',
+    galleryTitle:'📸 Memories', gallerySub:'The album of everything that makes you happy',
+    memoriesCount:'memories', ourStory:'✨ Our story', addPhotoBtn:'Add',
+    giftsTitle:'🎁 Gifts', giftsSub:'Because distance doesn\'t stop gestures of love',
+    wishlistTitle:'🌟 Wish list', addWishBtn:'+ Add wish',
+    payMethodsTitle:'💳 Payment / shipping methods', addPaymentBtn:'+ Add method',
+    settingsTitle:'⚙️ Settings', saveBtnLbl:'Save', cancelBtnLbl:'Cancel',
+    myName:'Your name', theirName:'Partner\'s name',
+    togetherSince:'Together since', nextMeeting:'Next meeting',
+    myTz:'Your timezone', theirTz:'Partner\'s timezone',
+    notifLabel:'Notifications', notifDesc:'Reminders and alerts',
+    themeDark:'🌙 Dark mode', themeLight:'☀️ Light mode',
+    themeDarkDesc:'Dark background, more romantic', themeLightDesc:'White background, brighter',
+    langLabel:'Idioma / Language',
+    coupleCodeTitle:'Your couple code', coupleCodeHint:'Tap to copy and share with your partner',
+    partnerLinkedLbl:'Partner linked', notLinkedLbl:'Not linked yet',
+    linkedTag:'✅ Linked', pendingTag:'Pending',
+    logoutBtn:'Sign out', closeBtn:'Close', leaveRoomBtn:'🚪 Leave room and join another',
+    leaveRoomTitle:'Leave room',
+    leaveRoomMsg:'You will leave your current room. Your partner can keep using it. You can join another room with a code.',
+    stayBtn:'Stay', abandonBtn:'Leave',
+    onboardSub:'Create a new room for your partner, or join an existing one with their code.',
+    createRoomBtn:'💕 Create new room', joinRoomBtn:'🔑 Join with code',
+    createConfirm:'A code will be generated for your partner to join. Confirm?',
+    createBtn:'Create room →', backBtn:'← Back',
+    creating:'Creating your room', roomCreated:'Room created!',
+    shareCode:'Share this code with your partner:', tapCopy:'Tap to copy 📋',
+    partnerInstr:'Your partner opens the app, signs in and chooses "Join with code"',
+    enterBtn:'Enter my room →', cancelRoomBtn:'← Cancel and go back',
+    joinTitle:'Join a room', joinSub:'Enter the 6-character code your partner shared with you:',
+    joinBtn:'Join 💕', joinError:'Code not found', joinErrorSub:'Check the code and try again.',
+    tryAgain:'Try again', linkedTitle:'Connected!',
+    linkedSub:'You\'re now linked. Ready to be together even when apart! 💕',
+    enterAppBtn:'Enter →',
+    madeBy:'Made with 💕 by',
+    synced:'Synced', saving:'Saving…', offlineLbl:'Offline',
+    noCode:'No code yet',
   },
 };
 
 let currentLang = 'es';
-function t(key) { return LANGS[currentLang]?.[key] || LANGS.es[key] || key; }
+function t(key) { return LANGS[currentLang]?.[key] ?? LANGS.es[key] ?? key; }
 
 function detectLang() {
   const saved = localStorage.getItem('contigo_lang');
   if (saved && LANGS[saved]) return saved;
-  const nav = (navigator.language || navigator.userLanguage || 'es').toLowerCase();
+  const nav = (navigator.language || 'es').toLowerCase();
   return nav.startsWith('en') ? 'en' : 'es';
 }
 
@@ -1161,24 +1257,109 @@ function setLang(lang) {
   currentLang = lang;
   localStorage.setItem('contigo_lang', lang);
   applyLangToDOM();
+  rerenderCurrent();
 }
 
+function loadLang() { currentLang = detectLang(); applyLangToDOM(); }
+
 function applyLangToDOM() {
-  // Auth screen
-  const loginBtn = document.querySelector('.btn-google');
-  if (loginBtn) loginBtn.childNodes[1] && (loginBtn.childNodes[loginBtn.childNodes.length-1].textContent = ' ' + t('loginBtn'));
-  const tagline = document.querySelector('.auth-tagline');
-  if (tagline) tagline.textContent = t('appTagline');
-  // Nav labels
-  const navLabels = document.querySelectorAll('.nl');
-  const keys = ['navHome','navWatch','navGames','navLove','navGallery','navGifts'];
-  navLabels.forEach((el,i) => { if(keys[i]) el.textContent = t(keys[i]); });
-  // Touch button
-  const tb = document.getElementById('touch-btn');
-  if (tb && !tb.innerHTML.includes('💓💓')) tb.innerHTML = t('touchBtn');
-  // Day labels
-  const dt = document.querySelector('.stat-lbl');
-  if (dt) dt.textContent = t('daysTogetherLbl');
+  const q = s => document.querySelector(s);
+  const qa = s => document.querySelectorAll(s);
+  const tx = (sel, key) => { const el = q(sel); if (el) el.textContent = t(key); };
+
+  // Auth
+  tx('.auth-tagline', 'appTagline');
+  const lb = q('.btn-google'); if (lb) { const last = lb.lastChild; if (last?.nodeType === 3) last.textContent = ' ' + t('loginBtn'); }
+
+  // Nav
+  const navKeys = ['navHome','navWatch','navGames','navLove','navGallery','navGifts'];
+  qa('.nl').forEach((el, i) => { if (navKeys[i]) el.textContent = t(navKeys[i]); });
+
+  // Home
+  const tb = q('#touch-btn'); if (tb && !tb.innerHTML.includes('💓💓')) tb.innerHTML = t('touchBtn');
+  const sLbls = qa('.stat-lbl'); if (sLbls[0]) sLbls[0].textContent = t('daysTogetherLbl'); if (sLbls[1]) sLbls[1].textContent = t('daysNextLbl');
+  const cLbls = qa('.clock-lbl'); if (cLbls[0]) cLbls[0].textContent = t('clockMyZone'); if (cLbls[1]) cLbls[1].textContent = t('clockTheirZone');
+  // Card titles home
+  const homeTitles = qa('#s-home .card-title');
+  if (homeTitles[1]) homeTitles[1].textContent = t('clocksTitle');
+  if (homeTitles[2]) homeTitles[2].textContent = t('moodTitle');
+  if (homeTitles[3]) homeTitles[3].textContent = t('quoteTitle');
+  const qb = q('.quote-refresh'); if (qb) qb.textContent = t('quoteBtn');
+
+  // Section headers
+  const sh = (id, tk, sk) => { const s = q(`#s-${id} .sec-head`); if (!s) return; const h = s.querySelector('h2'), p = s.querySelector('p'); if (h) h.textContent = t(tk); if (p) p.textContent = t(sk); };
+  sh('watch','watchTitle','watchSub'); sh('games','gamesTitle','gamesSub');
+  sh('love','loveTitle','loveSub'); sh('gallery','galleryTitle','gallerySub'); sh('gifts','giftsTitle','giftsSub');
+
+  // Watch filters + button
+  const ft = qa('.ftab'); if (ft[0]) ft[0].textContent = t('filterAll'); if (ft[ft.length-1]) ft[ft.length-1].textContent = t('filterSeen');
+  const awb = q('#s-watch .btn-primary'); if (awb) awb.textContent = t('addWatchBtn');
+
+  // Games labels
+  const subLbls = qa('.subsection-lbl'); if (subLbls[0]) subLbls[0].textContent = t('inApp'); if (subLbls[1]) subLbls[1].textContent = t('inCall');
+  const gkeys = [['g1n','g1d'],['g2n','g2d'],['g3n','g3d'],['g4n','g4d'],['g5n','g5d'],['g6n','g6d'],['g7n','g7d'],['g8n','g8d']];
+  qa('.game-card').forEach((c, i) => { if (!gkeys[i]) return; const n = c.querySelector('.gn'), d = c.querySelector('.gd'); if (n) n.textContent = t(gkeys[i][0]); if (d) d.textContent = t(gkeys[i][1]); });
+
+  // Love section
+  const loveCards = qa('#s-love .card-title'); if (loveCards[0]) loveCards[0].textContent = t('newNoteTitle');
+  const np = q('#love-input'); if (np) np.placeholder = t('notePlaceholder');
+  const schb = q('#s-love .btn-ghost'); if (schb) schb.textContent = t('scheduleBtn');
+  const sndbtn = q('#s-love .btn-primary'); if (sndbtn) sndbtn.textContent = t('sendBtn');
+  const remTitle = q('#s-love > div > .card-title'); if (remTitle) remTitle.textContent = t('remindersTitle');
+  const addRemBtn = q('#s-love .btn-secondary'); if (addRemBtn) addRemBtn.textContent = t('addReminderBtn');
+
+  // Gallery
+  const galTag = q('#gal-count')?.parentElement; // tag-gold span
+  const galTags = qa('#s-gallery .tag'); if (galTags[1]) galTags[1].textContent = t('ourStory');
+
+  // Gifts
+  const wishT = q('#s-gifts .card .card-title'); if (wishT) wishT.textContent = t('wishlistTitle');
+  const addWishBtn = q('[onclick="addWish()"]'); if (addWishBtn) addWishBtn.textContent = t('addWishBtn');
+  const payT = qa('#s-gifts .card-title'); if (payT[1]) payT[1].textContent = t('payMethodsTitle');
+  const addPayBtn = q('[onclick="openModal(\'m-add-payment\')"]'); if (addPayBtn) addPayBtn.textContent = t('addPaymentBtn');
+
+  // Settings modal
+  const sm = q('#m-settings');
+  if (sm) {
+    tx('#m-settings .modal-title', 'settingsTitle');
+    const lbs = sm.querySelectorAll('.label');
+    const lkeys = ['myName','theirName','togetherSince','nextMeeting','myTz','theirTz','langLabel'];
+    lbs.forEach((l, i) => { if (lkeys[i]) l.textContent = t(lkeys[i]); });
+    const trows = sm.querySelectorAll('.trow-info');
+    if (trows[0]) { trows[0].querySelector('.tl').textContent = t('notifLabel'); trows[0].querySelector('.td').textContent = t('notifDesc'); }
+    if (trows[1]) { const isLight = document.body.classList.contains('light-mode'); trows[1].querySelector('.tl').textContent = t(isLight ? 'themeLight' : 'themeDark'); trows[1].querySelector('.td').textContent = t(isLight ? 'themeLightDesc' : 'themeDarkDesc'); }
+    const sbtns = sm.querySelectorAll('.btn');
+    sbtns.forEach(b => { if (b.getAttribute('onclick')?.includes('closeModal')) b.textContent = t('cancelBtnLbl'); if (b.getAttribute('onclick')?.includes('saveSettings')) b.textContent = t('saveBtnLbl'); });
+  }
+
+  // User menu modal
+  const um = q('#m-user-menu');
+  if (um) {
+    const cct = um.querySelector('.card > div:first-child'); if (cct) cct.textContent = t('coupleCodeTitle');
+    const cch = um.querySelector('.card > div:last-child'); if (cch) cch.textContent = t('coupleCodeHint');
+    const plbl = um.querySelector('.trow .tl'); if (plbl) plbl.textContent = t('partnerLinkedLbl');
+    um.querySelectorAll('.btn').forEach(b => {
+      const oc = b.getAttribute('onclick') || '';
+      if (oc.includes('logout')) b.textContent = t('logoutBtn');
+      if (oc.includes('leaveRoom')) b.textContent = t('leaveRoomBtn');
+      if (oc.includes("closeModal('m-user-menu')")) b.textContent = t('closeBtn');
+    });
+  }
+
+  // Leave room modal
+  tx('#m-leave-room .modal-title', 'leaveRoomTitle');
+  const lrp = q('#m-leave-room p'); if (lrp) lrp.textContent = t('leaveRoomMsg');
+  qa('#m-leave-room .btn').forEach(b => {
+    const oc = b.getAttribute('onclick') || '';
+    if (oc.includes('closeModal')) b.textContent = t('stayBtn');
+    if (oc.includes('leaveRoom')) b.textContent = t('abandonBtn');
+  });
+
+  // Sync status text
+  setSyncStatus(isSyncing ? 'syncing' : (navigator.onLine ? 'online' : 'offline'));
+
+  // Lang selector
+  const ls = q('#cfg-lang'); if (ls) ls.value = currentLang;
 }
 // ═══════════════════════ FIREBASE INIT ═══════════════════════
 // FB_CONFIG viene de config.js
@@ -1317,7 +1498,7 @@ function setSyncStatus(state) {
   const txt = document.getElementById('sync-txt');
   if (!dot) return;
   dot.className = 'sync-dot ' + state;
-  txt.textContent = state === 'online' ? 'Sincronizado' : state === 'syncing' ? 'Guardando…' : 'Sin conexión';
+  txt.textContent = state === 'online' ? t('synced') : state === 'syncing' ? t('saving') : t('offlineLbl');
 }
 
 function updatePartnerStatus() {
@@ -1426,10 +1607,27 @@ function openUserMenu() {
 }
 
 function copyInviteCode() {
-  if (!inviteCode) return;
+  if (!inviteCode) { showToast('⚠️ Sin código aún'); return; }
   navigator.clipboard?.writeText(inviteCode)
     .then(() => showToast('📋 Código copiado: ' + inviteCode))
     .catch(() => showToast('Tu código: ' + inviteCode));
+}
+
+function openLeaveRoomModal() {
+  closeModal('m-user-menu');
+  openModal('m-leave-room');
+}
+
+async function leaveRoom() {
+  closeModal('m-leave-room');
+  if (presenceRef) presenceRef.set({ online: false, lastSeen: Date.now(), name: S.cfg.me });
+  if (syncListenerRef) syncListenerRef.off();
+  await fbDb.ref(`userCouples/${currentUser.uid}`).remove();
+  await fbDb.ref(`userInvites/${currentUser.uid}`).remove();
+  await fbDb.ref(`couples/${coupleId}/members/${currentUser.uid}`).remove();
+  coupleId = null; inviteCode = null; partnerUid = null;
+  showToast('🚪 Sala abandonada');
+  showJoinRoom();
 }
 
 // ══════════════════ ONBOARDING ══════════════════
@@ -2370,10 +2568,6 @@ function toggleTheme() {
 function loadTheme() {
   const saved = localStorage.getItem('contigo_theme');
   applyTheme(saved === 'light');
-}
-function loadLang() {
-  currentLang = detectLang();
-  applyLangToDOM();
 }
 
 // ══════════════════ UTILS ══════════════════
