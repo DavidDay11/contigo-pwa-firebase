@@ -1625,21 +1625,30 @@ function openLeaveRoomModal() {
 async function leaveRoom() {
   closeModal('m-leave-room');
 
-  if (presenceRef) presenceRef.set({ online: false, lastSeen: Date.now(), name: S.cfg.me });
-  if (syncListenerRef) syncListenerRef.off();
+  try {
+    if (presenceRef) presenceRef.set({ online: false, lastSeen: Date.now(), name: S.cfg.me });
+    if (syncListenerRef) syncListenerRef.off();
 
-  await fbDb.ref(`userCouples/${currentUser.uid}`).remove();
-  await fbDb.ref(`userInvites/${currentUser.uid}`).remove();
-  await fbDb.ref(`couples/${coupleId}/members/${currentUser.uid}`).remove();
+    await fbDb.ref(`userCouples/${currentUser.uid}`).remove();
+    await fbDb.ref(`userInvites/${currentUser.uid}`).remove();
+    await fbDb.ref(`couples/${coupleId}/members/${currentUser.uid}`).remove();
+  } catch (e) {
+    console.warn(e); // no rompe la UI
+  }
 
   coupleId = null;
   inviteCode = null;
   partnerUid = null;
 
+  // 👇 mostrar onboarding primero
   document.getElementById('app').style.display = 'none';
-  document.getElementById('onboard-screen').classList.remove('hidden');
+  const onboard = document.getElementById('onboard-screen');
+  onboard.classList.remove('hidden');
 
-  showJoinRoom(); // sin timeout
+  // 👇 render después (evita null)
+  setTimeout(() => {
+    showJoinRoom();
+  }, 0);
 
   showToast('🚪 Sala abandonada');
 }
@@ -1726,7 +1735,16 @@ function enterAfterCreate() {
   loadFromFirebase().then(() => enterApp());
 }
 function showJoinRoom() {
-  const el = document.getElementById('onboard-content');
+  const screen = document.getElementById('onboard-screen');
+
+  let el = document.getElementById('onboard-content');
+
+  // si no existe, lo crea (anti-rotura)
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'onboard-content';
+    screen.appendChild(el);
+  }
 
   el.innerHTML = `
     <h2>Ingresar a sala</h2>
