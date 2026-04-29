@@ -1735,18 +1735,10 @@ function enterAfterCreate() {
   loadFromFirebase().then(() => enterApp());
 }
 function showJoinRoom() {
-  const screen = document.getElementById('onboard-screen');
+  const card = document.querySelector('#onboard-screen .modal, #onboard-screen .card, #onboard-screen > div');
+  if (!card) return;
 
-  let el = document.getElementById('onboard-content');
-
-  // si no existe, lo crea (anti-rotura)
-  if (!el) {
-    el = document.createElement('div');
-    el.id = 'onboard-content';
-    screen.appendChild(el);
-  }
-
-  el.innerHTML = `
+  card.innerHTML = `
     <h2>Ingresar a sala</h2>
     <input id="join-code" placeholder="Código">
     <button onclick="joinRoom()">Entrar</button>
@@ -1793,7 +1785,6 @@ async function joinRoom() {
     `;
   } catch(e) {
     showToast('❌ Error al unirse: ' + e.message);
-    showJoinRoom();
   }
 }
 
