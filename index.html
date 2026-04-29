@@ -1561,10 +1561,7 @@ fbAuth.onAuthStateChanged(async user => {
   updateUserPill();
 
   // Buscar si ya tiene coupleId guardado
-  const invSnap = await fbDb.ref(`userInvites/${currentUser.uid}`).get();
-if (invSnap.exists()) {
-  inviteCode = invSnap.val();
-}
+  
   const ucSnap = await fbDb.ref(`userCouples/${user.uid}`).get();
   if (ucSnap.exists()) {
     coupleId = ucSnap.val();
@@ -1635,14 +1632,18 @@ async function leaveRoom() {
   await fbDb.ref(`userInvites/${currentUser.uid}`).remove();
   await fbDb.ref(`couples/${coupleId}/members/${currentUser.uid}`).remove();
 
-  coupleId = null;
-  inviteCode = null;
-  partnerUid = null;
+  // 👇 ACA VA EL PASO 2
+  S.coupleId = null;
+  S.inviteCode = null;
+  S.partnerUid = null;
 
+  // 👇 luego UI
+  document.getElementById('app').classList.add('hidden');
   document.getElementById('onboard-screen').classList.remove('hidden');
-  document.getElementById('app').style.display = 'none';
 
-  showJoinRoom(); // ahora SI se ve
+  setTimeout(() => {
+    showJoinRoom();
+  }, 0);
 
   showToast('🚪 Sala abandonada');
 }
@@ -1728,19 +1729,14 @@ async function cancelCreatedRoom() {
 function enterAfterCreate() {
   loadFromFirebase().then(() => enterApp());
 }
-
 function showJoinRoom() {
-  const card = document.getElementById('onboard-card');
-  card.innerHTML = `
-    <div style="font-size:42px;margin-bottom:10px;">🔑</div>
-    <div class="onboard-title">Unirme a una sala</div>
-    <p class="onboard-sub">Ingresá el código de 6 letras que te compartió tu pareja:</p>
-    <input class="field" id="join-code-inp" placeholder="XXXXXX" maxlength="6"
-      style="text-align:center;font-size:28px;font-family:var(--font-display);letter-spacing:.2em;margin-bottom:14px;text-transform:uppercase;">
-    <button class="btn btn-primary btn-full" onclick="joinRoom()" style="margin-bottom:8px;">Unirme 💕</button>
-    <button class="btn btn-ghost btn-full" onclick="showOnboarding()">← Volver</button>
+  const el = document.getElementById('onboard-content');
+
+  el.innerHTML = `
+    <h2>Ingresar a sala</h2>
+    <input id="join-code" placeholder="Código">
+    <button onclick="joinRoom()">Entrar</button>
   `;
-  setTimeout(() => document.getElementById('join-code-inp')?.focus(), 100);
 }
 
 async function joinRoom() {
