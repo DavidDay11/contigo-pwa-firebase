@@ -1525,17 +1525,16 @@ function rerenderCurrent() {
 
 // ══════════════════ AUTH FLOW ══════════════════
 function loginGoogle() {
+  
   const provider = new firebase.auth.GoogleAuthProvider();
   provider.addScope('profile');
   provider.addScope('email');
   fbAuth.signInWithPopup(provider).catch(err => {
     if (err.code !== 'auth/popup-closed-by-user') showToast('❌ Error: ' + err.message);
   });
+  
 }
-const invSnap = await fbDb.ref(`userInvites/${currentUser.uid}`).get();
-if (invSnap.exists()) {
-  inviteCode = invSnap.val();
-}
+
 
 function logout() {
   if (presenceRef) presenceRef.set({ online: false, lastSeen: Date.now(), name: S.cfg.me });
@@ -1562,6 +1561,10 @@ fbAuth.onAuthStateChanged(async user => {
   updateUserPill();
 
   // Buscar si ya tiene coupleId guardado
+  const invSnap = await fbDb.ref(`userInvites/${currentUser.uid}`).get();
+if (invSnap.exists()) {
+  inviteCode = invSnap.val();
+}
   const ucSnap = await fbDb.ref(`userCouples/${user.uid}`).get();
   if (ucSnap.exists()) {
     coupleId = ucSnap.val();
