@@ -1739,9 +1739,16 @@ function showJoinRoom() {
   if (!card) return;
 
   card.innerHTML = `
-    <h2>Ingresar a sala</h2>
-    <input id="join-code" placeholder="Código">
-    <button onclick="joinRoom()">Entrar</button>
+    <div style="font-size:42px;margin-bottom:10px;">🔑</div>
+    <div class="onboard-title">Ingresar a sala</div>
+    
+    <input id="join-code" placeholder="Código" class="input" style="margin:12px 0;">
+    
+    <button class="btn btn-primary btn-full" onclick="joinRoom()">Entrar</button>
+    
+    <button class="btn btn-secondary btn-full" onclick="renderOnboarding()" style="margin-top:8px;">
+      ← Volver
+    </button>
   `;
 }
 
