@@ -1632,18 +1632,14 @@ async function leaveRoom() {
   await fbDb.ref(`userInvites/${currentUser.uid}`).remove();
   await fbDb.ref(`couples/${coupleId}/members/${currentUser.uid}`).remove();
 
-  // 👇 ACA VA EL PASO 2
-  S.coupleId = null;
-  S.inviteCode = null;
-  S.partnerUid = null;
+  coupleId = null;
+  inviteCode = null;
+  partnerUid = null;
 
-  // 👇 luego UI
-  document.getElementById('app').classList.add('hidden');
+  document.getElementById('app').style.display = 'none';
   document.getElementById('onboard-screen').classList.remove('hidden');
 
-  setTimeout(() => {
-    showJoinRoom();
-  }, 0);
+  showJoinRoom(); // sin timeout
 
   showToast('🚪 Sala abandonada');
 }
