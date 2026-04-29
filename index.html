@@ -1532,6 +1532,10 @@ function loginGoogle() {
     if (err.code !== 'auth/popup-closed-by-user') showToast('❌ Error: ' + err.message);
   });
 }
+const invSnap = await fbDb.ref(`userInvites/${currentUser.uid}`).get();
+if (invSnap.exists()) {
+  inviteCode = invSnap.val();
+}
 
 function logout() {
   if (presenceRef) presenceRef.set({ online: false, lastSeen: Date.now(), name: S.cfg.me });
@@ -1817,10 +1821,7 @@ async function enterApp() {
 }
 
 async function loadFromFirebase() {
-  const invSnap = await fbDb.ref(`userInvites/${currentUser.uid}`).get();
-if (invSnap.exists()) {
-  inviteCode = invSnap.val();
-}
+  
   if (!coupleId) return;
   try {
     const snap = await coupleRef('data').get();
