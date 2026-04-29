@@ -1668,7 +1668,19 @@ function showOnboarding() {
     <button class="btn btn-secondary btn-full" onclick="showJoinRoom()">🔑 Unirme con código</button>
   `;
 }
+function renderOnboarding() {
+  const card = document.querySelector('#onboard-screen .modal, #onboard-screen .card, #onboard-screen > div');
+  if (!card) return;
 
+  card.innerHTML = `
+    <div style="font-size:52px;margin-bottom:12px;">💑</div>
+    <div class="onboard-title">¡Hola!</div>
+    <p class="onboard-sub">¿Querés crear una sala nueva o unirte con código?</p>
+
+    <button class="btn btn-primary btn-full" onclick="createRoom()">💞 Crear sala nueva</button>
+    <button class="btn btn-secondary btn-full" onclick="showJoinRoom()">🔑 Unirme con código</button>
+  `;
+}
 async function createRoom() {
   const card = document.getElementById('onboard-card');
   // Confirmación antes de crear
